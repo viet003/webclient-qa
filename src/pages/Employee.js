@@ -1,60 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
 import { FaSort } from "react-icons/fa";
 
 const Employee = () => {
-  const [surveys, setSurveys] = useState([
+  const [employees, setEmployees] = useState([
     {
-      id: 1,
-      title: "Customer Satisfaction Survey 2024",
-      surveyorName: "John Smith",
-      status: "Published",
-      remarks: "Annual feedback collection"
+      full_name: "John Doe",
+      dob: "1985-01-15T00:00:00.000Z",
+      gender: 1,
+      phone_number: "123456789",
+      address: "123 Main St",
+      dependent_number: 2,
+      updatedAt: "2024-11-02T14:19:03.870Z",
+      department: { department_name: "HR" }
     },
     {
-      id: 2,
-      title: "Employee Engagement Survey",
-      surveyorName: "Sarah Johnson",
-      status: "Draft",
-      remarks: "Q1 2024 Assessment"
-    },
-    {
-      id: 3,
-      title: "Product Feedback Survey",
-      surveyorName: "Mike Wilson",
-      status: "Closed",
-      remarks: "Beta testing feedback"
-    },
-    {
-      id: 4,
-      title: "Market Research Survey",
-      surveyorName: "Emma Davis",
-      status: "Published",
-      remarks: "Competitor analysis"
+      full_name: "Jane Smith",
+      dob: "1990-06-20T00:00:00.000Z",
+      gender: 2,
+      phone_number: "987654321",
+      address: "456 Elm St",
+      dependent_number: 1,
+      updatedAt: "2024-11-02T14:19:03.870Z",
+      department: { department_name: "Engineering" }
     }
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingSurvey, setEditingSurvey] = useState(null);
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newSurvey, setNewSurvey] = useState({
-    title: "",
-    surveyorName: "",
-    status: "Draft",
-    remarks: ""
+  const [newEmployee, setNewEmployee] = useState({
+    full_name: "",
+    dob: "",
+    gender: 1,
+    phone_number: "",
+    address: "",
+    dependent_number: 0,
+    updatedAt: new Date().toISOString(),
+    department: { department_name: "" }
   });
   const itemsPerPage = 5;
 
-  const filteredSurveys = surveys.filter(survey =>
-    Object.values(survey).some(value =>
+  const filteredEmployees = employees.filter(employee =>
+    Object.values(employee).some(value =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
-  const sortedSurveys = [...filteredSurveys].sort((a, b) => {
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
     if (!sortConfig.key) return 0;
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "ascending" ? -1 : 1;
@@ -65,12 +61,12 @@ const Employee = () => {
     return 0;
   });
 
-  const paginatedSurveys = sortedSurveys.slice(
+  const paginatedEmployees = sortedEmployees.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(sortedSurveys.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedEmployees.length / itemsPerPage);
 
   const handleSort = (key) => {
     setSortConfig({
@@ -82,48 +78,39 @@ const Employee = () => {
     });
   };
 
-  const handleEdit = (survey) => {
-    setEditingSurvey(survey);
+  const handleEdit = (employee) => {
+    setEditingEmployee(employee);
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    setSurveys(surveys.filter(survey => survey.id !== id));
+  const handleDelete = (phone_number) => {
+    setEmployees(employees.filter(employee => employee.phone_number !== phone_number));
   };
 
   const handleSave = (e) => {
     e.preventDefault();
-    setSurveys(surveys.map(survey =>
-      survey.id === editingSurvey.id ? editingSurvey : survey
+    setEmployees(employees.map(employee =>
+      employee.phone_number === editingEmployee.phone_number ? { ...editingEmployee, updatedAt: new Date().toISOString() } : employee
     ));
     setShowModal(false);
-    setEditingSurvey(null);
+    setEditingEmployee(null);
   };
 
   const handleAdd = (e) => {
     e.preventDefault();
-    const id = surveys.length > 0 ? Math.max(...surveys.map(s => s.id)) + 1 : 1;
-    setSurveys([...surveys, { ...newSurvey, id }]);
+    const newEmployeeData = { ...newEmployee, updatedAt: new Date().toISOString() };
+    setEmployees([...employees, newEmployeeData]);
     setShowAddModal(false);
-    setNewSurvey({
-      title: "",
-      surveyorName: "",
-      status: "Draft",
-      remarks: ""
+    setNewEmployee({
+      full_name: "",
+      dob: "",
+      gender: 1,
+      phone_number: "",
+      address: "",
+      dependent_number: 0,
+      updatedAt: new Date().toISOString(),
+      department: { department_name: "" }
     });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Published":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "Draft":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "Closed":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
   };
 
   return (
@@ -133,7 +120,7 @@ const Employee = () => {
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
           <input
             type="text"
-            placeholder="Search surveys..."
+            placeholder="Tìm kiếm theo tên..."
             className="py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -152,7 +139,7 @@ const Employee = () => {
         <table className="min-w-full border-collapse table-auto">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              {["title", "surveyorName", "status", "remarks"].map(key => (
+              {["Họ tên", "Ngày sinh", "Giới tính", "Số điện thoại", "Địa chỉ", "Phòng ban", "Phụ thuộc", "Cập nhật"].map(key => (
                 <th
                   key={key}
                   className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer"
@@ -164,38 +151,48 @@ const Employee = () => {
                   </div>
                 </th>
               ))}
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Hành động</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedSurveys.map((survey) => (
-              <tr key={survey.id} className="hover:bg-gray-50">
+            {paginatedEmployees.map((employee) => (
+              <tr key={employee.phone_number} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {survey.title}
+                  {employee.full_name}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {survey.surveyorName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(survey.status)}`}>
-                    {survey.status}
-                  </span>
+                  {new Date(employee.dob).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {survey.remarks}
+                  {employee.gender === 1 ? "Male" : "Female"}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                  {employee.phone_number}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                  {employee.address}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                  {employee.department.department_name}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                  {employee.dependent_number}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                  {new Date(employee.updatedAt).toLocaleString()}
                 </td>
                 <td className="px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
                   <button
-                    onClick={() => handleEdit(survey)}
+                    onClick={() => handleEdit(employee)}
                     className="text-blue-600 hover:text-blue-900"
-                    aria-label="Edit survey"
+                    aria-label="Edit employee"
                   >
                     <FiEdit2 className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(survey.id)}
+                    onClick={() => handleDelete(employee.phone_number)}
                     className="text-red-600 hover:text-red-900"
-                    aria-label="Delete survey"
+                    aria-label="Delete employee"
                   >
                     <FiTrash2 className="w-5 h-5" />
                   </button>
@@ -208,7 +205,7 @@ const Employee = () => {
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-700">
-          Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedSurveys.length)} of {sortedSurveys.length} results
+          Hiển thị trang {((currentPage - 1) * itemsPerPage) + 1} với {Math.min(currentPage * itemsPerPage, sortedEmployees.length)} / {sortedEmployees.length} kết quả
         </div>
         <div className="flex space-x-2">
           <button
@@ -230,64 +227,41 @@ const Employee = () => {
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="p-6 bg-white rounded-lg w-96">
-            <h2 className="mb-4 text-xl font-bold">Edit Survey</h2>
+          <div className="p-6 bg-white rounded-lg w-[700px]">
+            <h2 className="mb-4 text-xl font-bold">Cập nhật thông tin</h2>
             <form onSubmit={handleSave}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={editingSurvey.title}
-                    onChange={(e) => setEditingSurvey({...editingSurvey, title: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Surveyor Name</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={editingSurvey.surveyorName}
-                    onChange={(e) => setEditingSurvey({...editingSurvey, surveyorName: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status</label>
-                  <select
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={editingSurvey.status}
-                    onChange={(e) => setEditingSurvey({...editingSurvey, status: e.target.value})}
-                  >
-                    <option value="Published">Published</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Closed">Closed</option>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Họ và tên</label>
+                  <input type="text" value={editingEmployee.full_name} onChange={(e) => setEditingEmployee({ ...editingEmployee, full_name: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Ngày sinh</label>
+                  <input type="date" value={editingEmployee.dob.split('T')[0]} onChange={(e) => setEditingEmployee({ ...editingEmployee, dob: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Giới tính</label>
+                  <select value={editingEmployee.gender} onChange={(e) => setEditingEmployee({ ...editingEmployee, gender: parseInt(e.target.value) })} className="w-full p-2 border rounded">
+                    <option value={1}>Male</option>
+                    <option value={2}>Female</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={editingSurvey.remarks}
-                    onChange={(e) => setEditingSurvey({...editingSurvey, remarks: e.target.value})}
-                  />
+
+                <div className="flex flex-col w-full">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Số điện thoại</label>
+                  <input type="text" value={editingEmployee.phone_number} onChange={(e) => setEditingEmployee({ ...editingEmployee, phone_number: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Địa chỉ</label>
+                  <input type="text" value={editingEmployee.address} onChange={(e) => setEditingEmployee({ ...editingEmployee, address: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Phòng ban</label>
+                  <input type="text" value={editingEmployee.department.department_name} onChange={(e) => setEditingEmployee({ ...editingEmployee, department: { department_name: e.target.value } })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Số người phụ thuộc</label>
+                  <input type="number" value={editingEmployee.dependent_number} onChange={(e) => setEditingEmployee({ ...editingEmployee, dependent_number: parseInt(e.target.value) })} className="w-full p-2 border rounded" />
                 </div>
               </div>
               <div className="flex justify-end mt-4 space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">Đóng</button>
+                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Cập nhật</button>
               </div>
             </form>
           </div>
@@ -296,66 +270,42 @@ const Employee = () => {
 
       {showAddModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="p-6 bg-white rounded-lg w-96">
-            <h2 className="mb-4 text-xl font-bold">Add New Survey</h2>
+          <div className="p-6 bg-white rounded-lg w-[700px]">
+            <h2 className="mb-4 text-xl font-bold">Thêm mới</h2>
             <form onSubmit={handleAdd}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={newSurvey.title}
-                    onChange={(e) => setNewSurvey({...newSurvey, title: e.target.value})}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Surveyor Name</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={newSurvey.surveyorName}
-                    onChange={(e) => setNewSurvey({...newSurvey, surveyorName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status</label>
-                  <select
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={newSurvey.status}
-                    onChange={(e) => setNewSurvey({...newSurvey, status: e.target.value})}
-                  >
-                    <option value="Published">Published</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Closed">Closed</option>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Họ và tên</label>
+                  <input type="text" value={newEmployee.full_name} onChange={(e) => setNewEmployee({ ...newEmployee, full_name: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Ngày sinh</label>
+                  <input type="date" value={newEmployee.dob} onChange={(e) => setNewEmployee({ ...newEmployee, dob: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Giới tính</label>
+                  <select value={newEmployee.gender} onChange={(e) => setNewEmployee({ ...newEmployee, gender: parseInt(e.target.value) })} className="w-full p-2 border rounded">
+                    <option value={1}>Male</option>
+                    <option value={2}>Female</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={newSurvey.remarks}
-                    onChange={(e) => setNewSurvey({...newSurvey, remarks: e.target.value})}
-                  />
+
+                <div className="flex flex-col w-full">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Số điện thoại</label>
+                  <input type="text" value={newEmployee.phone_number} onChange={(e) => setNewEmployee({ ...newEmployee, phone_number: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Địa chỉ</label>
+                  <input type="text" value={newEmployee.address} onChange={(e) => setNewEmployee({ ...newEmployee, address: e.target.value })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Phòng ban</label>
+                  <input type="text" value={newEmployee.department.department_name} onChange={(e) => setNewEmployee({ ...newEmployee, department: { department_name: e.target.value } })} className="w-full p-2 border rounded" />
+
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Số người phụ thuộc</label>
+                  <input type="number" value={newEmployee.dependent_number} onChange={(e) => setNewEmployee({ ...newEmployee, dependent_number: parseInt(e.target.value) })} className="w-full p-2 border rounded" />
                 </div>
               </div>
+
               <div className="flex justify-end mt-4 space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Add Survey
-                </button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">Đóng</button>
+                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Thêm mới</button>
               </div>
             </form>
           </div>

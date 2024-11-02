@@ -19,7 +19,7 @@ const authConfig = {
 
 const stateConfig = {
     ...commonConfig,
-    key: 'page',
+    key: 'state',
     whiteList: ['active']
 }
 

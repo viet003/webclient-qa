@@ -82,9 +82,9 @@ const Login = function () {
   return (
     <div className="flex items-center">
       <div class="bg-cover bg-center h-screen w-full flex">
-        <div className="md:block hidden w-2/3 min-h-screen object-cover relative bg-primary">
+        <div className="relative hidden object-cover w-2/3 min-h-screen md:block bg-primary">
           <img src={score} alt="" className="sm:h-[200px] sm:w-[200px] absolute top-0 left-0 w-[100px] h-[100]px" />
-          <img src={student} alt="" className="h-screen absolute right-0" />
+          <img src={student} alt="" className="absolute right-0 h-screen" />
           <span className="absolute left-2 bottom-2 text-gray-400 text-[11px] flex flex-col items-center justify-center">
             <p> Copyright © 2024.</p>
             <p>Developed by Black Team.</p>
@@ -92,15 +92,15 @@ const Login = function () {
         </div>
         <section class="bg-gray-50 min-h-screen w-full flex items-center justify-center">
           <div class="bg-gray-100 flex rounded-2xl shadow-lg xl:max-w-3xl w-full mx-20 p-5 items-center">
-            <div className="xl:w-2/3 w-full flex items-center justify-center p-4">
-              <div className="bg-white rounded-lg shadow-2xl w-full p-8 transform transition-all duration-300 hover:scale-[1.02]">
-                <h2 className="text-3xl font-bold text-center text-primary mb-8">Đăng nhập</h2>
+            <div className="flex items-center justify-center w-full p-4 xl:w-2/3">
+              <div className="bg-white rounded-xl shadow-2xl w-full p-8 transform transition-all duration-300 hover:scale-[1.02]">
+                <h2 className="mb-8 text-3xl font-bold text-center text-primary">Đăng nhập</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div className="relative">
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-primary mb-1"
+                      className="block mb-1 text-sm font-medium text-primary"
                     >
                       Email
                     </label>
@@ -126,11 +126,11 @@ const Login = function () {
                       </p>
                     )}
                     {suggestions.length > 0 && (
-                      <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg">
+                      <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
                         {suggestions.map((suggestion, index) => (
                           <li
                             key={index}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
                             {suggestion}
@@ -143,7 +143,7 @@ const Login = function () {
                   <div className="relative">
                     <label
                       htmlFor="password"
-                      className="block text-sm font-medium text-primary mb-1"
+                      className="block mb-1 text-sm font-medium text-primary"
                     >
                       Mật khẩu
                     </label>
@@ -163,7 +163,7 @@ const Login = function () {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-primary focus:outline-none"
+                        className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-primary focus:outline-none"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -187,7 +187,7 @@ const Login = function () {
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
-                        <FaSpinner className="animate-spin mr-2" /> Loading...
+                        <FaSpinner className="mr-2 animate-spin" /> Loading...
                       </span>
                     ) : (
                       "Đăng nhập"
