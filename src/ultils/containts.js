@@ -3,14 +3,10 @@ export const path = {
     LOGIN : "/",
     FORGOTPASS: "/forgotpass",
     PROFILE: "profile",
-    LOOKUP: "lookup",
-    COURSE: "course",
+    EMPLOYEE: "employee",
+    DEPARTMENT: "department",
     HOME: "home",
     ACCOUNT : "account",
-    TOPIC: "topic",
-    USER: "user",
-    ANNOUNCEMENT : "announcements",
-    PEOPLES: "peoples"
 }
 
 // đường dẫn đến các trang

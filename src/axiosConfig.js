@@ -19,9 +19,11 @@ axios.interceptors.request.use(function (config) {
 
 // Thêm interceptor cho response
 axios.interceptors.response.use(
+  // Bất kỳ mã trạng thái nào trong phạm vi 2xx sẽ kích hoạt hàm này
   function (response) {
     return response;
   },
+  // Bất kỳ mã trạng thái nào ngoài phạm vi 2xx sẽ kích hoạt hàm này
   function (error) {
     if (error.response && error.response.status === 401) {
       // Thực hiện logout khi token hết hạn
