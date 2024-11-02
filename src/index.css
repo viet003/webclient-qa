@@ -23,6 +23,19 @@
         @apply hover:underline cursor-pointer
     }
 
+    ::-webkit-scrollbar {
+        @apply w-1
+    }
+
+    ::-webkit-scrollbar-track {}
+
+    ::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-gray-300 hidden h-4
+    }
+
+    .active {
+        @apply text-black bg-white
+    }
     /* html {
         font-family: 'Hanken Grotesk', sans-serif;
     } */

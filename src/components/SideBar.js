@@ -7,14 +7,14 @@ import { ImProfile } from "react-icons/im";
 import { MdFindInPage } from "react-icons/md";
 import { RiAccountPinBoxFill } from "react-icons/ri";
 import { path } from "../ultils/containts";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../store/actions";
 
 const SideBar = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [activeItem, setActiveItem] = useState(location.pathname); // Trạng thái của mục đang được chọn
+    const [activeItem, setActiveItem] = useState(""); // Trạng thái của mục đang được chọn
 
     const getContent = props.getContent;
     const type = props.type;
@@ -24,47 +24,53 @@ const SideBar = (props) => {
         getContent(input);
         setActiveItem(path);
         navigate(path);
+        handleClick(input)
     };
 
+    const { active } = useSelector(state => state.state)
+
+    const handleClick = (page) => {
+        dispatch(actions.state(page))
+    }
+
     useEffect(() => {
-        // Cập nhật trạng thái activeItem khi đường dẫn thay đổi
-        setActiveItem(location.pathname);
-    }, [location.pathname]);
+       setActiveItem(active)
+    }, [active]);
 
     return (
         <div className={`${toggle ? "" : ""} flex flex-col justify-between h-[90%]`}>
             <div className="">
                 <div
                     onClick={() => handleFunction("Home", path.HOME)}
-                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.HOME ? "active" : ""}`}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === "Home" ? "text-black bg-white" : ""}`}
                 >
                     <div className="mr-8 text-[1.7rem]"><RxDashboard /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Trang chủ</div>
                 </div>
                 <div
                     onClick={() => handleFunction("Thông tin cá nhân", path.PROFILE)}
-                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.PROFILE ? "active" : ""}`}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === "Thông tin cá nhân" ? "text-black bg-white" : ""}`}
                 >
                     <div className="mr-8 text-[1.7rem]"><ImProfile /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Thông tin</div>
                 </div>
                 <div
                     onClick={() => handleFunction("Quản lý nhân viên", path.EMPLOYEE)}
-                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.EMPLOYEE ? "active" : ""}`}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === "Quản lý nhân viên" ? "text-black bg-white" : ""}`}
                 >
                     <div className="mr-8 text-[1.7rem]"><FaUserGraduate /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Nhân viên</div>
                 </div>
                 <div
                     onClick={() => handleFunction("Quản lý phòng ban", path.DEPARTMENT)}
-                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.DEPARTMENT ? "active" : ""}`}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === "Quản lý phòng ban" ? "text-black bg-white" : ""}`}
                 >
                     <div className="mr-8 text-[1.7rem]"><MdFindInPage /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Phòng ban</div>
                 </div>
                 <div
                     onClick={() => handleFunction("Quản lý tài khoản", path.ACCOUNT)}
-                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.ACCOUNT ? "active" : ""}`}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === "Quản lý tài khoản" ? "text-black bg-white" : ""}`}
                 >
                     <div className="mr-8 text-[1.7rem]"><RiAccountPinBoxFill /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Tài khoản</div>
@@ -75,8 +81,6 @@ const SideBar = (props) => {
                 <div
                     onClick={() => {
                         dispatch(actions.logout());
-                        navigate(path.LOGIN);
-                        setActiveItem(path.LOGIN); // Đặt trạng thái active cho mục Đăng xuất
                     }}
                     className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.LOGIN ? "active" : ""}`}
                 >
