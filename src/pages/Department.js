@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
-import * as departmentApi from "../services";
 import { FaSort } from "react-icons/fa";
+import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -29,7 +29,7 @@ const Department = () => {
 
   const fetchData = async () => {
     try {
-      const response = await departmentApi.apiAllDepartment();
+      const response = await apiService.apiAllDepartment();
       if (response?.status === 200 && response?.data?.err === 0) {
         setDepartments(response?.data?.data);
       } else {
@@ -85,7 +85,7 @@ const Department = () => {
 
   const handleCreateApi = async (payload) => {
     try {
-      const response = await departmentApi.apiCreateDepartment(payload);
+      const response = await apiService.apiCreateDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
         setShowAddModal(false);
         await fetchData();
@@ -113,7 +113,7 @@ const Department = () => {
 
   const handleUpdateApi = async (payload) => {
     try {
-      const response = await departmentApi.apiUpdateDepartment(payload);
+      const response = await apiService.apiUpdateDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
         await fetchData();
         setShowModal(false);
@@ -133,7 +133,7 @@ const Department = () => {
 
   const handleDeleteApi = async (payload) => {
     try {
-      const response = await departmentApi.apiDeleteDepartment(payload);
+      const response = await apiService.apiDeleteDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
         await fetchData();
       } else {

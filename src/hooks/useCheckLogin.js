@@ -4,22 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { path } from '../ultils/containts';
 
 const useCheckLogin = () => {
-    const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+    const { isLoggedIn, active } = useSelector(state => state.auth);
     const navigate = useNavigate();
 
-    const redirectLogin = useCallback(() => {
+    useEffect(() => {
         if(!isLoggedIn) {
             navigate(path.LOGIN)
         } else {
-            navigate(path.HOME)
+            navigate(active)
         }
-    }, [navigate]);
-
-    useEffect(() => {
-        if (!isLoggedIn) {
-            redirectLogin();
-        }
-    }, [isLoggedIn, redirectLogin]);
+    }, [isLoggedIn]);
 };
 
 export default useCheckLogin;

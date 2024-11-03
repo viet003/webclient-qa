@@ -13,13 +13,13 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"
 
 const Header = (props) => {
-    const content = props.content;
+    const { content } = useSelector(state => state.state)
     const getValue = props.getValue;
     const setChange = props.setChange;
-    // const { token } = useSelector(state => state.auth)
-    // const email = token ? jwtDecode(token).email : "No user"
+    const { token } = useSelector(state => state.auth)
+    const email = token ? jwtDecode(token).email : "No user"
     // const type = jwtDecode(token).type
-    
+
     const conTrolMenu = () => {
         getValue();
     }
@@ -54,7 +54,7 @@ const Header = (props) => {
             <div onClick={conTroler} className="relative items-center hidden h-full mr-2 cursor-pointer md:flex text-primary z-100">
                 <div className="flex items-center h-full mr-2 cursor-pointer hover:text-orange-600 text-primary">
                     <img src={user} alt="" className={`w-[41px] h-[41px] rounded-full object-cover sm:mr-4`} />
-                    <p className="text-primary cursor-pointer text-[13px] scale-x-0 w-0 sm:w-[57%] sm:scale-100 lg:text-[1rem] mx-2">User@gmail.com</p>
+                    <p className="text-primary cursor-pointer text-[13px] scale-x-0 w-0 sm:w-[57%] sm:scale-100 lg:text-[1rem] mx-2">{email}</p>
                     <BiChevronDown className={`${toggle ? "rotate-180 transition-all duration-100" : "transition-all"} mx-2 text-[20px] xl:text-[25px] cursor-pointer`} />
                 </div>
                 <div className={` ${toggle ? "block transition-all duration-100" : "hidden"} absolute top-full right-0  shadow-xl rounded-xl z-80`}>

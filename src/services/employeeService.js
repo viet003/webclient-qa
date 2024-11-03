@@ -29,13 +29,26 @@ export const apiUpdateInfor = (payload) => new Promise((resolve, reject) => {
     }
 })
 
+// lấy toàn bộ
+export const apiAllEmployees = (payload) => new Promise((resolve, reject) => {
+    try {
+        const response = axiosConfig({
+            method: 'get',
+            url: 'api/employee',
+            data: payload
+        })
+        resolve(response)
+    } catch (error) {
+        reject(error)
+    }
+})
 
 //  tạo mới
-export const apiCreateDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiCreateEmployee = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/create',
+            url: 'api/employee/create',
             data: payload
         })
         resolve(response)
@@ -45,11 +58,11 @@ export const apiCreateDepartment = (payload) => new Promise((resolve, reject) =>
 })
 
 //  sửa
-export const apiUpdateDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiUpdateEmployee = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/update',
+            url: 'api/employee/update',
             data: payload
         })
         resolve(response)
@@ -59,11 +72,11 @@ export const apiUpdateDepartment = (payload) => new Promise((resolve, reject) =>
 })
 
 //  xóa
-export const apiDeleteDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiDeleteEmployee = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/delete',
+            url: 'api/employee/delete',
             data: payload
         })
         resolve(response)

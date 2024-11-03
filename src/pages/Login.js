@@ -75,7 +75,7 @@ const Login = function () {
       const response = await dispatch(actions.login(formData))
       console.log(response)
       if (response?.status === 200 && response?.data?.err === 0) {
-        navigator(path.MAIN)
+        navigator('/main/home')
       } else {
         toast.warn(response?.data?.msg)
       }

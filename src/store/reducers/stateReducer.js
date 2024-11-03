@@ -1,7 +1,8 @@
 import actionTypes from "../actions/actionTypes";
 
 const initState = {
-    active: ""
+    active: "",
+    content: ""
 }
 
 
@@ -10,7 +11,8 @@ const stateReducer = (state = initState, action) => {
         case actionTypes.STATE:
             return ({
                 ...state,
-                active: action?.data,
+                active: action?.data?.active,
+                content: action?.data?.content
             })
         default:
             return state;
