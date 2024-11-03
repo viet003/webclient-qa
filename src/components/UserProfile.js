@@ -8,7 +8,7 @@ const UserProfile = ({ toggle }) => {
 
     const { token } = useSelector(state => state.auth)
     const id = token ? jwtDecode(token).id : "No user"
-    const name = token ? jwtDecode(token).name : "Admin"
+    const name = token ? jwtDecode(token).email : "Admin"
     const type = token ? jwtDecode(token).type : ""
     // console.log(jwtDecode(token).name)
     return (
@@ -19,7 +19,7 @@ const UserProfile = ({ toggle }) => {
             <div className={toggle ? "opacity-0 transition-opacity text-white" : "opacity-100 duration-300"}>
                 {
                     true && (
-                        <p className="overflow-hidden text-sm whitespace-no-wrap overflow-ellipsis">User@gmail.com</p>
+                        <p className="overflow-hidden text-sm whitespace-no-wrap overflow-ellipsis">{name}</p>
                     )
                 }
                 {
@@ -28,7 +28,7 @@ const UserProfile = ({ toggle }) => {
                     )
                 }
                 <p className="text-[0.75rem] opacity-60 mt-1">
-                    {id}
+                    { type === 0 ? "Nhân viên" : type === 1 ? "Quản lý" : "Kế toán"}
                 </p>
             </div>
         </div>

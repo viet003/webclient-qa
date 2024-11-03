@@ -5,6 +5,7 @@ import { apiLogin } from "../../services/authService";
 export const login = (payload) => async (dispatch) => {
     try {
         const response = await apiLogin(payload)
+        // console.log(response)
         if(response?.data.err === 0) {
             dispatch({
                 type:actionTypes.LOGIN_SUCCESS,
@@ -22,6 +23,8 @@ export const login = (payload) => async (dispatch) => {
             type: actionTypes.LOGIN_FAIL,
             data: null
         })
+
+        return error.response
     }
 }
 

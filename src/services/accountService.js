@@ -1,6 +1,6 @@
 import axiosConfig from "../axiosConfig";
 // đăng nhập
-export const apiLogin = (payload) => new Promise((resolve, reject) => {
+export const apiGetInfor = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',

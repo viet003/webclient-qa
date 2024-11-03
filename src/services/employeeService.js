@@ -1,11 +1,11 @@
 import axiosConfig from "../axiosConfig";
 
-//  lấy thông tin phòng ban
-export const apiAllDepartment = (payload) => new Promise((resolve, reject) => {
+//  lấy thông tin người dùng
+export const apiGetInfor = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
-            method: 'get',
-            url: 'api/department',
+            method: 'post',
+            url: 'api/employee/id',
             data: payload
         })
         resolve(response)
@@ -13,6 +13,22 @@ export const apiAllDepartment = (payload) => new Promise((resolve, reject) => {
         reject(error)
     }
 })
+
+
+//  lấy thông tin người dùng
+export const apiUpdateInfor = (payload) => new Promise((resolve, reject) => {
+    try {
+        const response = axiosConfig({
+            method: 'post',
+            url: 'api/employee/update',
+            data: payload
+        })
+        resolve(response)
+    } catch (error) {
+        reject(error)
+    }
+})
+
 
 //  tạo mới
 export const apiCreateDepartment = (payload) => new Promise((resolve, reject) => {

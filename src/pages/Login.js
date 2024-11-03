@@ -8,14 +8,15 @@ import note from "../assets/note.png"
 import bag from "../assets/bag.png"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "../store/actions"
-import { useTitle } from 'react-use';
 import { FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
 import { MdOutlineContactSupport } from "react-icons/md";
 import { path } from "../ultils/containts";
 import { useNavigate } from "react-router-dom";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = function () {
+  const { isLoggedIn } = useSelector(state => state.auth)
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -28,7 +29,8 @@ const Login = function () {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const navigator = useNavigate()
-  
+  const dispatch = useDispatch()
+
   const emailDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"];
 
   const validateEmail = (email) => {
@@ -69,6 +71,15 @@ const Login = function () {
     if (!errors.email && !errors.password && formData.email && formData.password) {
       setIsLoading(true);
       // Simulate API call
+      // console.log(formData)
+      const response = await dispatch(actions.login(formData))
+      console.log(response)
+      if (response?.status === 200 && response?.data?.err === 0) {
+        navigator(path.MAIN)
+      } else {
+        toast.warn(response?.data?.msg)
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsLoading(false);
     }
@@ -79,8 +90,13 @@ const Login = function () {
     setSuggestions([]);
   };
 
+  useEffect(() => {
+    if (isLoggedIn) navigator('/main/home')
+  }, [])
+
   return (
     <div className="flex items-center">
+      <ToastContainer />
       <div class="bg-cover bg-center h-screen w-full flex">
         <div className="relative hidden object-cover w-2/3 min-h-screen md:block bg-primary">
           <img src={score} alt="" className="sm:h-[200px] sm:w-[200px] absolute top-0 left-0 w-[100px] h-[100]px" />
@@ -204,7 +220,7 @@ const Login = function () {
                 <div class="mt-3 text-xs flex justify-between items-center text-[#002D74]">
                   <p>Quên mật khẩu?</p>
                   <button class=" hover:bg-blue-600 hover:text-white py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300"
-                  onClick={() => navigator(path.FORGOTPASS)}
+                    onClick={() => navigator(path.FORGOTPASS)}
                   >Lấy lại</button>
                 </div>
               </div>

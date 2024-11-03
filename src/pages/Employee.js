@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
 import { FaSort } from "react-icons/fa";
 
@@ -32,6 +32,10 @@ const Employee = () => {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [paginatedEmployees, setPaginatedEmployees] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
   const [newEmployee, setNewEmployee] = useState({
     full_name: "",
     dob: "",
@@ -42,31 +46,32 @@ const Employee = () => {
     updatedAt: new Date().toISOString(),
     department: { department_name: "" }
   });
-  const itemsPerPage = 5;
 
-  const filteredEmployees = employees.filter(employee =>
-    Object.values(employee).some(value =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  useEffect(() => {
+    const filtered = employees
+      .filter((employee) =>
+        employee.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (!sortConfig.key) return 0;
+        const aValue = a[sortConfig.key] || "";
+        const bValue = b[sortConfig.key] || "";
+        if (aValue < bValue) return sortConfig.direction === "ascending" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "ascending" ? 1 : -1;
+        return 0;
+      });
 
-  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? 1 : -1;
-    }
-    return 0;
-  });
+    setFilteredEmployees(filtered);
 
-  const paginatedEmployees = sortedEmployees.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    const paginated = filtered.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
 
-  const totalPages = Math.ceil(sortedEmployees.length / itemsPerPage);
+    setPaginatedEmployees(paginated);
+
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+  }, [employees, searchTerm, sortConfig, currentPage]);
 
   const handleSort = (key) => {
     setSortConfig({
@@ -139,19 +144,30 @@ const Employee = () => {
         <table className="min-w-full border-collapse table-auto">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              {["Họ tên", "Ngày sinh", "Giới tính", "Số điện thoại", "Địa chỉ", "Phòng ban", "Phụ thuộc", "Cập nhật"].map(key => (
+              {[
+                { label: "Họ tên", key: "full_name" },
+                { label: "Ngày sinh", key: "dob" },
+                { label: "Giới tính", key: "gender" },
+                { label: "Số điện thoại", key: "phone_number" },
+                { label: "Địa chỉ", key: "address" },
+                { label: "Phòng ban", key: "department.department_name" },
+                { label: "Phụ thuộc", key: "dependent_number" },
+                { label: "Cập nhật", key: "updatedAt" }
+              ].map((column) => (
                 <th
-                  key={key}
+                  key={column.key}
                   className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer"
-                  onClick={() => handleSort(key)}
+                  onClick={() => handleSort(column.key)}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    <span>{column.label}</span>
                     <FaSort className="text-gray-400" />
                   </div>
                 </th>
               ))}
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Hành động</th>
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Hành động
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -164,7 +180,7 @@ const Employee = () => {
                   {new Date(employee.dob).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {employee.gender === 1 ? "Male" : "Female"}
+                  {employee.gender === 0 ? "Male" : "Female"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
                   {employee.phone_number}
@@ -205,7 +221,7 @@ const Employee = () => {
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-700">
-          Hiển thị trang {((currentPage - 1) * itemsPerPage) + 1} với {Math.min(currentPage * itemsPerPage, sortedEmployees.length)} / {sortedEmployees.length} kết quả
+          Hiển thị trang {((currentPage - 1) * itemsPerPage) + 1} với {Math.min(currentPage * itemsPerPage, filteredEmployees.length)} / {filteredEmployees.length} kết quả
         </div>
         <div className="flex space-x-2">
           <button
@@ -240,8 +256,8 @@ const Employee = () => {
 
                   <label className="block mt-2 text-sm font-medium text-gray-700">Giới tính</label>
                   <select value={editingEmployee.gender} onChange={(e) => setEditingEmployee({ ...editingEmployee, gender: parseInt(e.target.value) })} className="w-full p-2 border rounded">
-                    <option value={1}>Male</option>
-                    <option value={2}>Female</option>
+                    <option value={0}>Nam</option>
+                    <option value={1}>Nữ</option>
                   </select>
                 </div>
 
@@ -283,8 +299,8 @@ const Employee = () => {
 
                   <label className="block mt-2 text-sm font-medium text-gray-700">Giới tính</label>
                   <select value={newEmployee.gender} onChange={(e) => setNewEmployee({ ...newEmployee, gender: parseInt(e.target.value) })} className="w-full p-2 border rounded">
-                    <option value={1}>Male</option>
-                    <option value={2}>Female</option>
+                    <option value={0}>Nam</option>
+                    <option value={1}>Nữ</option>
                   </select>
                 </div>
 

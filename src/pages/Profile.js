@@ -1,17 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaUser, FaCamera, FaExclamationCircle, FaEdit, FaUserCircle, FaPen } from "react-icons/fa";
 import User from "../assets/user.jpg"
+import { apiGetInfor, apiUpdateInfor } from "../services/employeeService";
+import { useSelector } from "react-redux";
+import { jwtDecode } from 'jwt-decode';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Profile = () => {
+
+    const { token } = useSelector(state => state.auth)
+    const employee_id = token ? jwtDecode(token).employee_id : "";
+
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        full_name: "",
         email: "",
-        dateOfBirth: "",
-        phone: "",
-        bio: "",
+        dob: "",
+        phone_number: "",
         gender: "",
         address: "",
+        department_name: "",
+        dependent_number: "",
         socialLinks: {
             linkedin: "",
             twitter: "",
@@ -19,8 +28,59 @@ const Profile = () => {
         }
     });
 
+    const fetchData = async () => {
+        try {
+            const response = await apiGetInfor({ employee_id });
+            if (response?.status === 200 && response?.data?.err === 0) {
+                const data = response.data.data;
+
+                setFormData({
+                    id: data.id,
+                    full_name: data.full_name,
+                    email: data.account?.email || "",
+                    dob: data.dob ? data.dob.split("T")[0] : "",
+                    phone_number: data.phone_number || "",
+                    gender: data.gender,
+                    address: data.address || "",
+                    department_name: data.department?.department_name || "",
+                    dependent_number: data.dependent_number || "",
+                    employee_id: employee_id,
+                    socialLinks: {
+                        linkedin: "",
+                        twitter: "",
+                        github: ""
+                    }
+                });
+            } else {
+                toast.warn(response?.data?.msg);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Lỗi khi tải dữ liệu.");
+        }
+    };
+
+    const updateData = async (data) => {
+        try {
+            const response = await apiUpdateInfor(data);
+            if (response?.status === 200 && response?.data?.err === 0) {
+
+            } else {
+                fetchData()
+                toast.warn(response?.data?.msg);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Lỗi khi update dữ liệu.");
+        }
+    };
+
+
+    useEffect(() => {
+        fetchData();
+    }, [employee_id]);
+
     const [errors, setErrors] = useState({});
-    const [profileImage, setProfileImage] = useState("images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80");
     const [isEditing, setIsEditing] = useState(false);
 
     const validateField = (name, value) => {
@@ -28,18 +88,21 @@ const Profile = () => {
         switch (name) {
             case "email":
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                error = !emailRegex.test(value) ? "Invalid email format" : "";
+                error = !emailRegex.test(value) ? "Không đúng định dạng email" : "";
                 break;
-            case "dateOfBirth":
+            case "dob":
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-                error = !dateRegex.test(value) ? "Invalid date format (YYYY-MM-DD)" : "";
+                error = !dateRegex.test(value) ? "Sai định dạng ngày tháng (YYYY-MM-DD)" : "";
                 break;
-            case "phone":
+            case "phone_number":
                 const phoneRegex = /^\d{10}$/;
-                error = !phoneRegex.test(value) ? "Invalid phone number (10 digits)" : "";
+                error = !phoneRegex.test(value) ? "Số điện thoại bao gồm 10 chữ số" : "";
+                break;
+            case "dependent_number":
+                error = isNaN(value) || value < 0 ? "Số người phụ thuộc phải là số không âm" : "";
                 break;
             default:
-                error = value.trim() === "" ? "This field is required" : "";
+                error = value.trim() === "" ? "Không được bỏ trống thông tin" : "";
         }
         return error;
     };
@@ -69,7 +132,7 @@ const Profile = () => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileImage(reader.result);
+                // setProfileImage(reader.result);
             };
             reader.readAsDataURL(file);
         }
@@ -88,13 +151,21 @@ const Profile = () => {
 
         if (Object.keys(newErrors).length === 0) {
             console.log("Form submitted:", formData);
+            // api
+            updateData(formData);
+
             setIsEditing(false);
+        } else {
+            Object.values(newErrors).forEach((error) => {
+                toast.error(error);
+            });
         }
     };
 
     return (
         <div className="flex min-h-screen px-4 py-2 bg-gradient-to-br from-blue-50 to-indigo-50 sm:px-6 lg:px-8">
-            <div className="mx-auto overflow-hidden bg-white shadow-xl rounded-2xl">
+            <ToastContainer />
+            <div className="mx-auto overflow-hidden bg-white shadow-xl rounded-2xl min-w-[500px]">
                 <div className="flex flex-col gap-10 px-6 py-10 xl:flex-row justify-beetwen">
                     <div className="xl:pt-4">
                         <div className="text-center flexmb-8">
@@ -137,20 +208,20 @@ const Profile = () => {
                                     </h2>
                                     <div className="space-y-4">
                                         <div>
-                                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                                                Họ và đệm
+                                            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+                                                Họ và tên
                                             </label>
                                             <div className="relative mt-1">
                                                 <input
                                                     type="text"
-                                                    id="firstName"
-                                                    name="firstName"
-                                                    value={formData.firstName}
+                                                    id="full_name"
+                                                    name="full_name"
+                                                    value={formData.full_name}
                                                     onChange={handleInputChange}
-                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.firstName ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.full_name ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                                                     disabled={!isEditing}
                                                 />
-                                                {errors.firstName && (
+                                                {errors.full_name && (
                                                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                                                         <FaExclamationCircle className="text-red-500" />
                                                     </div>
@@ -159,34 +230,17 @@ const Profile = () => {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                                                Tên
-                                            </label>
-                                            <div className="relative mt-1">
-                                                <input
-                                                    type="text"
-                                                    id="lastName"
-                                                    name="lastName"
-                                                    value={formData.lastName}
-                                                    onChange={handleInputChange}
-                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.lastName ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
-                                                    disabled={!isEditing}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="Ngày sinh" className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
                                                 Ngày sinh
                                             </label>
                                             <div className="relative mt-1">
                                                 <input
                                                     type="text"
-                                                    id="Ngày sinh"
-                                                    name="Ngày sinh"
-                                                    value={formData.dateOfBirth}
+                                                    id="dob"
+                                                    name="dob"
+                                                    value={formData.dob}
                                                     onChange={handleInputChange}
-                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.lastName ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.dob ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                                                     disabled={!isEditing}
                                                 />
                                             </div>
@@ -194,7 +248,7 @@ const Profile = () => {
 
                                         <div>
                                             <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                                                Tuổi
+                                                Giới tính
                                             </label>
                                             <select
                                                 id="gender"
@@ -205,10 +259,27 @@ const Profile = () => {
                                                 disabled={!isEditing}
                                             >
                                                 <option value="">Lựa chọn giới tính</option>
-                                                <option value="male">Nam</option>
-                                                <option value="female">Nữ</option>
-                                                <option value="other">Khác</option>
+                                                <option value="0">Nam</option>
+                                                <option value="1">Nữ</option>
+                                                <option value="2">Khác</option>
                                             </select>
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="dependent_number" className="block text-sm font-medium text-gray-700">
+                                                Số người phụ thuộc
+                                            </label>
+                                            <div className="relative mt-1">
+                                                <input
+                                                    type="text"
+                                                    id="dependent_number"
+                                                    name="dependent_number"
+                                                    value={formData.dependent_number}
+                                                    onChange={handleInputChange}
+                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.dob ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                                                    disabled={!isEditing}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -239,17 +310,17 @@ const Profile = () => {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">
                                                 Số điện thoại
                                             </label>
                                             <div className="relative mt-1">
                                                 <input
                                                     type="tel"
-                                                    id="phone"
-                                                    name="phone"
-                                                    value={formData.phone}
+                                                    id="phone_number"
+                                                    name="phone_number"
+                                                    value={formData.phone_number}
                                                     onChange={handleInputChange}
-                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.phone ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                                                    className={`block w-full px-4 py-3 rounded-lg border ${errors.phone_number ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                                                     disabled={!isEditing}
                                                 />
                                             </div>
@@ -259,7 +330,7 @@ const Profile = () => {
                                             <label htmlFor="address" className="block text-sm font-medium text-gray-700">
                                                 Địa chỉ
                                             </label>
-                                            <textarea
+                                            <input
                                                 id="address"
                                                 name="address"
                                                 value={formData.address}
@@ -267,6 +338,21 @@ const Profile = () => {
                                                 rows="3"
                                                 className="block w-full px-4 py-3 mt-1 transition-colors duration-200 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                                 disabled={!isEditing}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="department_name" className="block text-sm font-medium text-gray-700">
+                                                Phòng ban
+                                            </label>
+                                            <input
+                                                id="department_name"
+                                                name="department_name"
+                                                value={formData?.department_name}
+                                                onChange={handleInputChange}
+                                                rows="3"
+                                                className="block w-full px-4 py-3 mt-1 transition-colors duration-200 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                                disabled={true}
                                             />
                                         </div>
                                     </div>

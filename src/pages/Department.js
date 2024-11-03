@@ -1,81 +1,153 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
+import * as departmentApi from "../services";
+import { FaSort } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Department = () => {
-  const [departments, setDepartments] = useState([
-    {
-      id: "1017400558899691521",
-      department_name: "HR",
-      createdAt: "2024-11-02T14:05:12.802Z",
-      updatedAt: "2024-11-02T14:05:12.802Z",
-    },
-    {
-      id: "1017400558899757057",
-      department_name: "Engineering",
-      createdAt: "2024-11-02T14:05:12.802Z",
-      updatedAt: "2024-11-02T14:05:12.802Z",
-    },
-    {
-      id: "1017400558899789825",
-      department_name: "Sales",
-      createdAt: "2024-11-02T14:05:12.802Z",
-      updatedAt: "2024-11-02T14:05:12.802Z",
-    },
-  ]);
-
+  const [departments, setDepartments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
+  const [filteredDepartments, setFilteredDepartments] = useState([]);
+  const [paginatedDepartments, setPaginatedDepartments] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
+
   const [newDepartment, setNewDepartment] = useState({
     department_name: "",
   });
-  const itemsPerPage = 5;
 
-  const filteredDepartments = departments.filter((department) =>
-    department.department_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const paginatedDepartments = filteredDepartments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage);
+  const fetchData = async () => {
+    try {
+      const response = await departmentApi.apiAllDepartment();
+      if (response?.status === 200 && response?.data?.err === 0) {
+        setDepartments(response?.data?.data);
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Lỗi khi tải dữ liệu.");
+    }
+  };
+
+  useEffect(() => {
+    const filtered = departments
+      .filter((department) =>
+        department.department_name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (!sortConfig.key) return 0;
+        const aValue = a[sortConfig.key] || "";
+        const bValue = b[sortConfig.key] || "";
+        if (aValue < bValue) return sortConfig.direction === "ascending" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "ascending" ? 1 : -1;
+        return 0;
+      });
+
+    setFilteredDepartments(filtered);
+
+    const paginated = filtered.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+
+    setPaginatedDepartments(paginated);
+
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+  }, [departments, searchTerm, sortConfig, currentPage]);
+
+  const handleSort = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction:
+        prevConfig.key === key && prevConfig.direction === "ascending"
+          ? "descending"
+          : "ascending",
+    }));
+  };
+
+  // thêm mưới
+  const handleAdd = (e) => {
+    e.preventDefault();
+    handleCreateApi(newDepartment);
+  };
+
+  const handleCreateApi = async (payload) => {
+    try {
+      const response = await departmentApi.apiCreateDepartment(payload);
+      if (response?.status === 200 && response?.data?.err === 0) {
+        setShowAddModal(false);
+        await fetchData();
+        setNewDepartment({
+          department_name: "",
+        });
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Lỗi khi tải dữ liệu.");
+    }
+  };
 
   const handleEdit = (department) => {
     setEditingDepartment(department);
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    setDepartments(departments.filter((department) => department.id !== id));
-  };
-
   const handleSave = (e) => {
     e.preventDefault();
-    setDepartments(departments.map((department) =>
-      department.id === editingDepartment.id ? editingDepartment : department
-    ));
-    setShowModal(false);
-    setEditingDepartment(null);
+    handleUpdateApi(editingDepartment)
   };
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    const id = Date.now().toString();
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
-    setDepartments([...departments, { ...newDepartment, id, createdAt, updatedAt }]);
-    setShowAddModal(false);
-    setNewDepartment({
-      department_name: "",
-    });
+  const handleUpdateApi = async (payload) => {
+    try {
+      const response = await departmentApi.apiUpdateDepartment(payload);
+      if (response?.status === 200 && response?.data?.err === 0) {
+        await fetchData();
+        setShowModal(false);
+        setEditingDepartment(null);
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Lỗi khi tải dữ liệu.");
+    }
+  };
+
+  const handleDelete = (id) => {
+    handleDeleteApi({ id })
+  };
+
+  const handleDeleteApi = async (payload) => {
+    try {
+      const response = await departmentApi.apiDeleteDepartment(payload);
+      if (response?.status === 200 && response?.data?.err === 0) {
+        await fetchData();
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Lỗi khi tải dữ liệu.");
+    }
   };
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
+      <ToastContainer />
       <div className="flex items-center justify-between mb-4">
         <div className="relative">
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -100,13 +172,29 @@ const Department = () => {
         <table className="min-w-full border-collapse table-auto">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID</th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tên phòng ban</th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Thời gian tạo</th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Thời gian sửa đổi</th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Hành động</th>
+              {[
+                { label: "ID", key: "id" },
+                { label: "Tên phòng ban", key: "department_name" },
+                { label: "Thời gian tạo", key: "createdAt" },
+                { label: "Thời gian sửa đổi", key: "updatedAt" }
+              ].map((column) => (
+                <th
+                  key={column.key}
+                  onClick={() => handleSort(column.key)}
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer"
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>{column.label}</span>
+                    <FaSort className="text-gray-400" />
+                  </div>
+                </th>
+              ))}
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Hành động
+              </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedDepartments.map((department) => (
               <tr key={department.id} className="hover:bg-gray-50">
@@ -158,6 +246,7 @@ const Department = () => {
         </div>
       </div>
 
+      {/* Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="p-6 bg-white rounded-lg w-96">
@@ -169,7 +258,7 @@ const Department = () => {
                   <input
                     type="text"
                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
-                    value={editingDepartment.department_name}
+                    value={editingDepartment?.department_name || ""}
                     onChange={(e) =>
                       setEditingDepartment({
                         ...editingDepartment,
@@ -200,6 +289,7 @@ const Department = () => {
         </div>
       )}
 
+      {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="p-6 bg-white rounded-lg w-96">
@@ -208,7 +298,7 @@ const Department = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Tên phòng ban</label>
-                   <input
+                  <input
                     type="text"
                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
                     value={newDepartment.department_name}

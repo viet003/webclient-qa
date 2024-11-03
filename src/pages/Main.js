@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiChevronLeft } from "react-icons/bi"
 import { Sidebar, Footer, UserProfile, Header } from "../components";
 import { Outlet } from "react-router-dom";
@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 import notLoggin from '../assets/notLogin.svg'
+import Home from './Home';
+import useCheckLogin from "../hooks/useCheckLogin";
 
 const Main = () => {
     let text = "";
@@ -17,10 +19,8 @@ const Main = () => {
     const [content, setContent] = useState("Home")
     const [openMenu, setOpenMenu] = useState(false)
     const [change, setChange] = useState(false)
-    const [loading, setLoading] = useState(false)
     const { isLoggedIn } = useSelector(state => state.auth)
     const { token } = useSelector(state => state.auth)
-    const [invalidFields, setInvalidFields] = useState([])
     const type = token ? jwtDecode(token).type : ""
     const email = token ? jwtDecode(token).email : ''
     //const name = token? jwtDecode(token).name : 'Admin'
@@ -35,10 +35,12 @@ const Main = () => {
         setOpenMenu((prev) => prev = !prev);
     }
 
+    useCheckLogin();
+
     return (
         <div className="w-full h-screen">
             {
-                !isLoggedIn && (
+                isLoggedIn && (
                     <div className="flex object-cover h-full">
                         <div className={`${toggle ? "w-[4.8rem]" : ""} sidebar fixed z-10 hidden lg:block`}>
                             <UserProfile toggle={toggle} />
@@ -73,7 +75,7 @@ const Main = () => {
                     </div>
                 )
             }
-            {/* {
+            {
                 !isLoggedIn && (
                     <div className="flex flex-col items-center justify-center w-full min-h-screen">
                         <div className="w-[500px]">
@@ -83,7 +85,7 @@ const Main = () => {
                         <p className="text-[18px]">Please adjust your security preferences before continuing . . .</p>
                     </div>
                 )
-            } */}
+            }
 
         </div>
     )

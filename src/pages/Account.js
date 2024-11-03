@@ -126,20 +126,28 @@ const Account = () => {
         <table className="min-w-full border-collapse table-auto">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              {["Email", "Loại tài khoản", "Cập nhật", "Họ và tên"].map(key => (
+              {[
+                { label: "Email", key: "email" },
+                { label: "Loại tài khoản", key: "type" },
+                { label: "Cập nhật", key: "updatedAt" },
+                { label: "Họ và tên", key: "employee.full_name" }
+              ].map(({ label, key }) => (
                 <th
                   key={key}
                   className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer"
                   onClick={() => handleSort(key)}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    <span>{label}</span>
                     <FaSort className="text-gray-400" />
                   </div>
                 </th>
               ))}
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Hành động</th>
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Hành động
+              </th>
             </tr>
+
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedEmployees.map((employee) => (
