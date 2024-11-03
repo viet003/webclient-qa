@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { IoIosLogOut } from "react-icons/io";
-import { FaUserGraduate } from "react-icons/fa";
+import { TbReportMoney } from "react-icons/tb";
 import { ImProfile } from "react-icons/im";
 import { MdFindInPage } from "react-icons/md";
 import { RiAccountPinBoxFill } from "react-icons/ri";
 import { path } from "../ultils/containts";
+import { FaUsers } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../store/actions";
 
@@ -56,7 +57,7 @@ const SideBar = (props) => {
                     onClick={() => handleNavigation("Quản lý nhân viên", path.EMPLOYEE)}
                     className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.EMPLOYEE ? "text-black bg-white" : ""}`}
                 >
-                    <div className="mr-8 text-[1.7rem]"><FaUserGraduate /></div>
+                    <div className="mr-8 text-[1.7rem]"><FaUsers /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Nhân viên</div>
                 </div>
                 <div
@@ -73,12 +74,20 @@ const SideBar = (props) => {
                     <div className="mr-8 text-[1.7rem]"><RiAccountPinBoxFill /></div>
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Tài khoản</div>
                 </div>
+                <div
+                    onClick={() => handleNavigation("Quản lý bảng lương", path.SALARY)}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.SALARY ? "text-black bg-white" : ""}`}
+                >
+                    <div className="mr-8 text-[1.7rem]"><TbReportMoney /></div>
+                    <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Bảng lương</div>
+                </div>
             </div>
 
             <div>
                 <div
                     onClick={() => {
                         dispatch(actions.logout());
+                        dispatch(actions.state({ active: null, content: null}))
                     }}
                     className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.LOGIN ? "text-black bg-white" : ""}`}
                 >

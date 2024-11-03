@@ -7,6 +7,7 @@ export const path = {
     DEPARTMENT: "department",
     HOME: "home",
     ACCOUNT : "account",
+    SALARY: "salary"
 }
 
 // đường dẫn đến các trang

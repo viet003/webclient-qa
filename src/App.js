@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Login, ForgotPass, Main, Profile, Employee, Department, Home, Account } from "./pages";
+import { Login, ForgotPass, Main, Profile, Employee, Department, Home, Account, Salary } from "./pages";
 import { path } from "./ultils/containts";
 
 function App() {
@@ -13,8 +13,8 @@ function App() {
           <Route path={path.ACCOUNT} element={<Account />} />
           <Route path={path.EMPLOYEE} element={<Employee />} />
           <Route path={path.DEPARTMENT} element={<Department />} />
+          <Route path={path.SALARY} element={<Salary />} />
           {/* <Route path={path.COURSE} element={<Course />} />
-          <Route path={path.TOPIC} element={<Topic />} />
           <Route path={`${path.TOPIC}/:topicid`} element={<Modules />}>
             <Route path={path.ANNOUNCEMENT} element={<Announcements />} />
             <Route path={path.PEOPLES} element={<Peoples />} />

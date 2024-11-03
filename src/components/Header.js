@@ -63,7 +63,7 @@ const Header = (props) => {
                             <BiKey className="text-[25px]" />
                             <p>Thay đổi mật khẩu</p>
                         </div>
-                        <div className="flex items-center gap-4 cursor-pointer hover:text-orange-700" onClick={() => { dispatch(actions.logout()); navigate(path.LOGIN) }}>
+                        <div className="flex items-center gap-4 cursor-pointer hover:text-orange-700" onClick={() => { dispatch(actions.logout()); navigate(path.LOGIN); dispatch(actions.state({ active: null, content: null})) }}>
                             <IoIosLogOut className="text-[25px]" />
                             <p>Đăng xuất</p>
                         </div>

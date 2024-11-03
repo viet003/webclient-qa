@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, act } from "react";
 import student from "../assets/student.png"
 import score from "../assets/score.png"
 import homework from "../assets/homework.png"
@@ -76,6 +76,7 @@ const Login = function () {
       console.log(response)
       if (response?.status === 200 && response?.data?.err === 0) {
         navigator('/main/home')
+        dispatch(actions.state({ active: path.HOME, content: "Trang chủ"}))
       } else {
         toast.warn(response?.data?.msg)
       }

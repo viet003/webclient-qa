@@ -1,11 +1,11 @@
 import axiosConfig from "../axiosConfig";
 
 //  lấy thông tin phòng ban
-export const apiAllDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiAllSalaries = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'get',
-            url: 'api/department',
+            url: 'api/salary',
             data: payload
         })
         resolve(response)
@@ -14,12 +14,27 @@ export const apiAllDepartment = (payload) => new Promise((resolve, reject) => {
     }
 })
 
+// lấy toàn bộ
+export const apiAllWithoutSalary= (payload) => new Promise((resolve, reject) => {
+    try {
+        const response = axiosConfig({
+            method: 'get',
+            url: 'api/employee/nosl',
+            data: payload
+        })
+        resolve(response)
+    } catch (error) {
+        reject(error)
+    }
+})
+
+
 //  tạo mới
-export const apiCreateDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiCreateSalary = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/add',
+            url: 'api/salary/add',
             data: payload
         })
         resolve(response)
@@ -29,11 +44,11 @@ export const apiCreateDepartment = (payload) => new Promise((resolve, reject) =>
 })
 
 //  sửa
-export const apiUpdateDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiUpdateSalary = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/update',
+            url: 'api/salary/update',
             data: payload
         })
         resolve(response)
@@ -43,11 +58,11 @@ export const apiUpdateDepartment = (payload) => new Promise((resolve, reject) =>
 })
 
 //  xóa
-export const apiDeleteDepartment = (payload) => new Promise((resolve, reject) => {
+export const apiDeleteSalary = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/department/delete',
+            url: 'api/salary/delete',
             data: payload
         })
         resolve(response)

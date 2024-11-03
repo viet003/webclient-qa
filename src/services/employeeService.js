@@ -48,7 +48,7 @@ export const apiCreateEmployee = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'post',
-            url: 'api/employee/create',
+            url: 'api/employee/add',
             data: payload
         })
         resolve(response)
