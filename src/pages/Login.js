@@ -51,7 +51,7 @@ const Login = function () {
       }
 
       if (!validateEmail(value) && value) {
-        setErrors({ ...errors, email: "Invalid email format" });
+        setErrors({ ...errors, email: "Không đúng định dạng email" });
       } else {
         setErrors({ ...errors, email: "" });
       }
@@ -59,7 +59,7 @@ const Login = function () {
 
     if (name === "password") {
       if (value.length < 8 && value) {
-        setErrors({ ...errors, password: "Password must be at least 8 characters" });
+        setErrors({ ...errors, password: "Mật khẩu phải lớn hơn hoặc bằng 8 ký tự" });
       } else {
         setErrors({ ...errors, password: "" });
       }

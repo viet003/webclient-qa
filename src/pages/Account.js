@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
 import { FaSort } from "react-icons/fa";
 import * as apiService from "../services";
+import { handleCheckError } from "../ultils/checkFunction"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from './../components/Spinner';
 
 const Account = () => {
   const [accounts, setAccounts] = useState([]);
@@ -20,6 +22,7 @@ const Account = () => {
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true)
   const [newAccount, setNewAccount] = useState({
     email: "",
     employee_id: 0,
@@ -53,6 +56,7 @@ const Account = () => {
       console.error("Error fetching data:", error);
       toast.error("Lỗi khi tải dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   useEffect(() => {
@@ -97,6 +101,10 @@ const Account = () => {
   };
 
   const handleCreateApi = async (payload) => {
+    setIsLoading(true)
+    if (handleCheckError(newAccount)) {
+      return;
+    }
     try {
       const response = await apiService.apiCreateAccount(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -113,8 +121,9 @@ const Account = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Lỗi khi tải dữ liệu.");
+      toast.error("Lỗi khi tạo tài khoản liệu.");
     }
+    setIsLoading(false)
   };
 
   const handleEdit = (account) => {
@@ -124,6 +133,11 @@ const Account = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    console.log(editingAccount)
+    if (handleCheckError(editingAccount)) {
+      return;
+    }
+    setIsLoading(true)
     try {
       const response = await apiService.apiUpdateAccount(editingAccount);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -137,9 +151,11 @@ const Account = () => {
       console.error("Error saving data:", error);
       toast.error("Lỗi khi cập nhật dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   const handleDelete = async (id) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiDeleteAccount({ id });
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -151,12 +167,18 @@ const Account = () => {
       console.error("Error deleting data:", error);
       toast.error("Lỗi khi xóa dữ liệu.");
     }
+    setIsLoading(false)
   };
 
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
+      <Spinner
+        isOpen={isLoading}
+        onClose={() => setIsLoading(false)}
+        message="Loading....."
+      />
       <div className="flex items-center justify-between mb-4">
         <div className="relative">
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -182,6 +204,7 @@ const Account = () => {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               {[
+                { label: "ID", key: "id" },
                 { label: "Email", key: "email" },
                 { label: "Loại tài khoản", key: "type" },
                 { label: "Họ và tên", key: "employee.full_name" }
@@ -205,6 +228,7 @@ const Account = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedAccounts.map((account) => (
               <tr key={account.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{account.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{account.email}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{account.type === 0 ? "Nhân viên" : account.type === 1 ? "Quản lý" : "Kế toán"}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{account.employee.full_name}</td>
@@ -321,7 +345,7 @@ const Account = () => {
       {showAddModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="p-6 bg-white rounded-lg w-96">
-            <h2 className="mb-4 text-xl font-bold">Add New Account</h2>
+            <h2 className="mb-4 text-xl font-bold">Tạo tài khoản</h2>
             <form onSubmit={handleAdd}>
               <div className="space-y-4">
                 <div>

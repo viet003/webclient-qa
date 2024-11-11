@@ -11,6 +11,7 @@ import * as actions from "../store/actions"
 import { path } from "../ultils/containts"
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"
+import { SubMenu } from ".";
 
 const Header = (props) => {
     const { content } = useSelector(state => state.state)
@@ -51,7 +52,7 @@ const Header = (props) => {
             <div className="p-4 w-[250px]">
                 <img src={logo} alt="" className="w-full h-full" />
             </div>
-            <div onClick={conTroler} className="relative items-center hidden h-full mr-2 cursor-pointer md:flex text-primary z-100">
+            {/* <div onClick={conTroler} className="relative items-center hidden h-full mr-2 cursor-pointer md:flex text-primary z-100">
                 <div className="flex items-center h-full mr-2 cursor-pointer hover:text-orange-600 text-primary">
                     <img src={user} alt="" className={`w-[41px] h-[41px] rounded-full object-cover sm:mr-4`} />
                     <p className="text-primary cursor-pointer text-[13px] scale-x-0 w-0 sm:w-[57%] sm:scale-100 lg:text-[1rem] mx-2">{email}</p>
@@ -69,7 +70,8 @@ const Header = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
+            <SubMenu />
         </div>
 
     );

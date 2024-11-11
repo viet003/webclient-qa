@@ -4,6 +4,7 @@ import { FaSort } from "react-icons/fa";
 import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from "../components/Spinner";
 
 const Department = () => {
   const [departments, setDepartments] = useState([]);
@@ -18,6 +19,7 @@ const Department = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
+  const [isLoading, setIsLoading] = useState(true)
   const [newDepartment, setNewDepartment] = useState({
     department_name: "",
   });
@@ -39,6 +41,7 @@ const Department = () => {
       console.error("Error fetching data:", error);
       toast.error("Lỗi khi tải dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   useEffect(() => {
@@ -84,6 +87,7 @@ const Department = () => {
   };
 
   const handleCreateApi = async (payload) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiCreateDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -97,8 +101,9 @@ const Department = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Lỗi khi tải dữ liệu.");
+      toast.error("Lỗi khi tạo phòng ban.");
     }
+    setIsLoading(false)
   };
 
   const handleEdit = (department) => {
@@ -112,6 +117,7 @@ const Department = () => {
   };
 
   const handleUpdateApi = async (payload) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiUpdateDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -123,8 +129,9 @@ const Department = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Lỗi khi tải dữ liệu.");
+      toast.error("Lỗi khi cập nhật dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   const handleDelete = (id) => {
@@ -132,6 +139,7 @@ const Department = () => {
   };
 
   const handleDeleteApi = async (payload) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiDeleteDepartment(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -141,13 +149,19 @@ const Department = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Lỗi khi tải dữ liệu.");
+      toast.error("Lỗi khi xóa bản ghi.");
     }
+    setIsLoading(false)
   };
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
+      <Spinner
+        isOpen={isLoading}
+        onClose={() => setIsLoading(false)}
+        message="Loading....."
+      />
       <div className="flex items-center justify-between mb-4">
         <div className="relative">
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />

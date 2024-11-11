@@ -8,7 +8,7 @@ const UserProfile = ({ toggle }) => {
 
     const { token } = useSelector(state => state.auth)
     const id = token ? jwtDecode(token).id : "No user"
-    const name = token ? jwtDecode(token).email : "Admin"
+    const name = token ? jwtDecode(token).name : "Guest"
     const type = token ? jwtDecode(token).type : ""
     // console.log(jwtDecode(token).name)
     return (

@@ -4,6 +4,7 @@ import { FaSort } from "react-icons/fa";
 import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from "../components/Spinner";
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -20,6 +21,7 @@ const Salary = () => {
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true)
   const [newSalary, setNewSalary] = useState({
     email: "",
     employee_id: "",
@@ -54,6 +56,7 @@ const Salary = () => {
       console.error("Error fetching data:", error);
       toast.error("Lỗi khi tải dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   useEffect(() => {
@@ -97,6 +100,7 @@ const Salary = () => {
   };
 
   const handleCreateApi = async (payload) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiCreateSalary(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -116,6 +120,7 @@ const Salary = () => {
       console.error("Error creating salary:", error);
       toast.error("Lỗi khi tạo mới dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   const handleEdit = (salary) => {
@@ -125,6 +130,7 @@ const Salary = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setIsLoading(true)
     try {
       const response = await apiService.apiUpdateSalary(editingSalary);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -138,9 +144,11 @@ const Salary = () => {
       console.error("Error saving salary:", error);
       toast.error("Lỗi khi cập nhật dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   const handleDelete = async (id) => {
+    setIsLoading(true)
     try {
       const response = await apiService.apiDeleteSalary({ id });
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -152,11 +160,17 @@ const Salary = () => {
       console.error("Error deleting salary:", error);
       toast.error("Lỗi khi xóa dữ liệu.");
     }
+    setIsLoading(false)
   };
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
+      <Spinner
+        isOpen={isLoading}
+        onClose={() => setIsLoading(false)}
+        message="Loading....."
+      />
       <div className="flex items-center justify-between mb-4">
         <div className="relative">
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />

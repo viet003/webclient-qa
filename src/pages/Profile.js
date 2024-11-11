@@ -6,12 +6,14 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from 'jwt-decode';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from './../components/Spinner';
 
 const Profile = () => {
 
     const { token } = useSelector(state => state.auth)
     const employee_id = token ? jwtDecode(token).employee_id : "";
-
+    
+    const [isLoading, setIsLoading] = useState(true)
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
@@ -58,9 +60,11 @@ const Profile = () => {
             console.error("Error fetching data:", error);
             toast.error("Lỗi khi tải dữ liệu.");
         }
+        setIsLoading(false)
     };
 
     const updateData = async (data) => {
+        setIsLoading(true)
         try {
             const response = await apiUpdateInfor(data);
             if (response?.status === 200 && response?.data?.err === 0) {
@@ -73,6 +77,7 @@ const Profile = () => {
             console.error("Error fetching data:", error);
             toast.error("Lỗi khi update dữ liệu.");
         }
+        setIsLoading(false)
     };
 
 
@@ -165,6 +170,11 @@ const Profile = () => {
     return (
         <div className="flex min-h-screen px-4 py-2 bg-gradient-to-br from-blue-50 to-indigo-50 sm:px-6 lg:px-8">
             <ToastContainer />
+            <Spinner
+                isOpen={isLoading}
+                onClose={() => setIsLoading(false)}
+                message="Loading....."
+            />
             <div className="mx-auto overflow-hidden bg-white shadow-xl rounded-2xl min-w-[500px]">
                 <div className="flex flex-col gap-10 px-6 py-10 xl:flex-row justify-beetwen">
                     <div className="xl:pt-4">
