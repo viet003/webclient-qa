@@ -255,14 +255,14 @@ const Account = () => {
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 cursor-auto"
+            className="px-3 py-2 border border-gray-300 rounded-md cursor-auto disabled:opacity-50"
           >
             <FiChevronLeft />
           </button>
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 cursor-auto"
+            className="px-3 py-2 border border-gray-300 rounded-md cursor-auto disabled:opacity-50"
           >
             <FiChevronRight />
           </button>
@@ -361,7 +361,7 @@ const Account = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
                   <input
-                    type="pass_word"
+                    type="password"
                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm"
                     value={newAccount.pass_word || ""}
                     onChange={(e) => setNewAccount({ ...newAccount, pass_word: e.target.value })}

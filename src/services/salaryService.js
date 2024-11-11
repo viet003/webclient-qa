@@ -70,4 +70,3 @@ export const apiDeleteSalary = (payload) => new Promise((resolve, reject) => {
         reject(error)
     }
 })
-

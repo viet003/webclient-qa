@@ -23,11 +23,18 @@ const Salary = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true)
-  const [newSalary, setNewSalary] = useState({
-    email: "",
+  const [openCaculate, setOpenCaculate] = useState(false)
+  const [caculate, setCaculate] = useState({
     employee_id: "",
-    type: 0,
-    pass_word: "",
+    full_name: "",
+    month: "",
+    year: "",
+    deduction: 0,
+    tax: 0,
+    total_salary: 0
+  })
+  const [newSalary, setNewSalary] = useState({
+    employee_id: "",
     base_salary: 0,
   });
 
@@ -168,6 +175,44 @@ const Salary = () => {
     setIsLoading(false)
   };
 
+  const caculateSalary = (salary) => {
+    const ob = apiService.getSalaryTax(salary.base_salary, salary.employee.dependent_number);
+    console.log(ob)
+    setCaculate({ ...caculate, employee_id: salary.employee.id, full_name: salary.employee.full_name, deduction: ob.deduction, tax: ob.tax, total_salary: ob.total_salary })
+    setOpenCaculate(true)
+  }
+
+  const handleAddMonthSalary = (e) => {
+    e.preventDefault();
+    handleCreateMontSalaryApi(caculate);
+  };
+
+  const handleCreateMontSalaryApi = async (payload) => {
+    setIsLoading(true)
+    try {
+      const response = await apiService.apiCreateMonthSalary(payload);
+      if (response?.status === 200 && response?.data?.err === 0) {
+        setOpenCaculate(false);
+        setCaculate({
+          employee_id: "",
+          full_name: "",
+          month: "",
+          year: "",
+          deduction: 0,
+          tax: 0,
+          total_salary: 0
+        });
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error creating salary:", error);
+      toast.error("Lỗi khi thêm mới lương theo tháng.");
+    }
+    setIsLoading(false)
+  };
+
+
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
@@ -201,10 +246,10 @@ const Salary = () => {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               {[{ label: "ID", key: "id" },
-              { label: "Họ và tên", key: "employee.full_name" },
-              { label: "Phòng ban", key: "employee.department.department_name" },
-              { label: "Phụ thuộc", key: "employee.dependent_number" },
-              { label: "Lương cơ bản", key: "base_salary" }]
+              { label: "Họ và tên", key: "salary.employee.full_name" },
+              { label: "Phòng ban", key: "salary.employee.department.department_name" },
+              { label: "Phụ thuộc", key: "salary.employee.dependent_number" },
+              { label: "Lương cơ bản", key: "salary.base_salary" }]
                 .map(({ label, key }) => (
                   <th
                     key={key}
@@ -234,7 +279,9 @@ const Salary = () => {
                   <button onClick={() => handleEdit(salary)} className="text-blue-600 hover:text-blue-900" aria-label="Edit salary">
                     <FiEdit2 className="w-5 h-5" />
                   </button>
-                  <button className="text-green-600 hover:text-green-900" aria-label="Change password">
+                  <button
+                    onClick={() => { caculateSalary(salary) }}
+                    className="text-green-600 hover:text-green-900" aria-label="Change password">
                     <CgArrowsExchange className="w-5 h-5" />
                   </button>
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
@@ -383,6 +430,101 @@ const Salary = () => {
         </div>
       )}
 
+      {
+        openCaculate && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="p-6 bg-white rounded-lg w-[700px]">
+              <h2 className="mb-4 text-xl font-bold">Bảng lương sau thuế theo tháng</h2>
+              <form onSubmit={handleAddMonthSalary}>
+                <div className="flex flex-row items-start gap-5 space-y-4">
+                  <div className="flex flex-col w-full mt-4">
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Tên nhân viên</label>
+                    <input
+                      type="text"
+                      value={caculate.full_name}
+                      onChange={(e) => setCaculate({ ...caculate, employee_id: e.target.value })}
+                      className="w-full p-2 border rounded"
+                      disabled={true}
+                    />
+
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Tháng</label>
+                    <select
+                      value={caculate.month}
+                      onChange={(e) => setCaculate({ ...caculate, month: e.target.value })}
+                      className="w-full p-2 border rounded"
+                    >
+                      {Array.from({ length: 12 }, (_, index) => {
+                        const month = new Date(2020, index); // Use any year (2020) for Date object, as month is zero-indexed
+                        return (
+                          <option key={index + 1} value={index + 1}>
+                            {month.toLocaleString("vi-VN", { month: "long" })} {/* Full month name in Vietnamese */}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Năm</label>
+                    <input
+                      type="number"
+                      value={caculate.year ?? new Date().getFullYear()}
+                      onChange={(e) => setCaculate({ ...caculate, year: e.target.value })}
+                      className="w-full p-2 border rounded"
+                      min="2020"
+                      max={new Date().getFullYear()}
+                      step="1"
+                    />
+                  </div>
+
+                  <div className="flex flex-col w-full">
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Khoản giảm trừ</label>
+                    <input
+                      type="text"
+                      value={formatToVND(caculate.deduction)}
+                      onChange={(e) => setCaculate({ ...caculate, deduction: +e.target.value })}
+                      className="w-full p-2 border rounded"
+                      disabled={true}
+                    />
+
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Thuế</label>
+                    <input
+                      type="text"
+                      value={formatToVND(caculate.tax)}
+                      onChange={(e) => setCaculate({ ...caculate, tax: +e.target.value })}
+                      className="w-full p-2 border rounded"
+                      disabled={true}
+                    />
+
+                    <label className="block mt-2 text-sm font-medium text-gray-700">Lương sau thuế</label>
+                    <input
+                      type="text"
+                      value={formatToVND(caculate.total_salary)}
+                      onChange={(e) => setCaculate({ ...caculate, total_salary: +e.target.value })}
+                      className="w-full p-2 border rounded"
+                      disabled={true}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4 space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setOpenCaculate(false)}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Đóng
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  >
+                    Thêm mới
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      }
     </div>
   );
 };
