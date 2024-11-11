@@ -50,7 +50,7 @@ const DropdownMenu = () => {
 
   return (
     <div
-      className="relative w-full bg-transparent md:w-64"
+      className="relative w-full bg-transparent cursor-pointer md:w-64"
       ref={dropdownRef}
       onKeyDown={handleKeyDown}
     >

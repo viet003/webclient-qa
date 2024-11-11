@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
+import { CgArrowsExchange } from "react-icons/cg";
 import { FaSort } from "react-icons/fa";
 import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
@@ -33,6 +34,10 @@ const Salary = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  function formatToVND(amount) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  }
 
   const fetchData = async () => {
     try {
@@ -176,7 +181,7 @@ const Salary = () => {
           <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
           <input
             type="text"
-            placeholder="Tìm kiếm theo email..."
+            placeholder="Tìm kiếm theo tên..."
             className="py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -195,7 +200,11 @@ const Salary = () => {
         <table className="min-w-full border-collapse table-auto">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              {[{ label: "ID", key: "id" }, { label: "Họ và tên", key: "employee.full_name" }, { label: "Lương cơ bản", key: "base_salary" }]
+              {[{ label: "ID", key: "id" },
+              { label: "Họ và tên", key: "employee.full_name" },
+              { label: "Phòng ban", key: "employee.department.department_name" },
+              { label: "Phụ thuộc", key: "employee.dependent_number" },
+              { label: "Lương cơ bản", key: "base_salary" }]
                 .map(({ label, key }) => (
                   <th
                     key={key}
@@ -218,10 +227,15 @@ const Salary = () => {
               <tr key={salary.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.employee.full_name}</td>
-                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.base_salary}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.employee.department.department_name}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.employee.dependent_number}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.base_salary)}</td>
                 <td className="px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
                   <button onClick={() => handleEdit(salary)} className="text-blue-600 hover:text-blue-900" aria-label="Edit salary">
                     <FiEdit2 className="w-5 h-5" />
+                  </button>
+                  <button className="text-green-600 hover:text-green-900" aria-label="Change password">
+                    <CgArrowsExchange className="w-5 h-5" />
                   </button>
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
                     <FiTrash2 className="w-5 h-5" />
@@ -241,14 +255,14 @@ const Salary = () => {
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
+            className="px-3 py-2 border border-gray-300 rounded-md cursor-pointer disabled:opacity-50"
           >
             <FiChevronLeft />
           </button>
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
+            className="px-3 py-2 border border-gray-300 rounded-md cursor-pointer disabled:opacity-50"
           >
             <FiChevronRight />
           </button>

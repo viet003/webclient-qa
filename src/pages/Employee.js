@@ -244,10 +244,10 @@ const Employee = () => {
           Hiển thị trang {((currentPage - 1) * itemsPerPage) + 1} với {Math.min(currentPage * itemsPerPage, filteredEmployees.length)} / {filteredEmployees.length} kết quả
         </div>
         <div className="flex space-x-2">
-          <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50">
+          <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 cursor-pointer">
             <FiChevronLeft />
           </button>
-          <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50">
+          <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 cursor-pointer">
             <FiChevronRight />
           </button>
         </div>
