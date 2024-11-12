@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Login, ForgotPass, Main, Profile, Employee, Department, Home, Account, Salary } from "./pages";
+import { Login, ForgotPass, Main, Profile, Employee, Department, Home, Account, Salary, SalaryTax } from "./pages";
 import { path } from "./ultils/containts";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -16,6 +16,7 @@ function App() {
         <Route path={path.MAIN} element={isLoggedIn ? <Main /> : <Navigate to={path.LOGIN} />}>
           <Route path={path.HOME} element={<Home />} />
           <Route path={path.PROFILE} element={<Profile />} />
+          <Route path={path.TAX} element={<SalaryTax />} />
           <Route path={path.ACCOUNT} element={type === 2 ? <Account /> : <Home /> } />
           <Route path={path.EMPLOYEE} element={type !== 0 ? <Employee /> : <Home /> } />
           <Route path={path.DEPARTMENT} element={type === 2 ? <Department /> : <Home /> } />

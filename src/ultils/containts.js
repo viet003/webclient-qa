@@ -8,6 +8,7 @@ export const path = {
     HOME: "home",
     ACCOUNT : "account",
     SALARY: "salary",
+    TAX: "tax",
     STAR: "*"
 }
 

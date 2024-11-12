@@ -5,6 +5,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { TbReportMoney } from "react-icons/tb";
 import { ImProfile } from "react-icons/im";
 import { MdFindInPage } from "react-icons/md";
+import { FaCalculator } from "react-icons/fa";
 import { RiAccountPinBoxFill } from "react-icons/ri";
 import { path } from "../ultils/containts";
 import { FaUsers } from "react-icons/fa";
@@ -93,6 +94,13 @@ const SideBar = (props) => {
                         </div>
                     )
                 }
+                <div
+                    onClick={() => handleNavigation("Thông tin lương và thuế", path.TAX)}
+                    className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.TAX ? "text-black bg-white" : ""}`}
+                >
+                    <div className="mr-8 text-[1.7rem]"><FaCalculator /></div>
+                    <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Lương và thuế</div>
+                </div>
             </div>
 
             <div>

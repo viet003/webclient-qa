@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiSearch, FiChevronLeft, FiChevronRight, FiPlusCircle } from "react-icons/fi";
-import { CgArrowsExchange } from "react-icons/cg";
 import { FaSort } from "react-icons/fa";
 import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
+import { CiCalculator1 } from "react-icons/ci";
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -189,6 +189,7 @@ const Salary = () => {
 
   const handleCreateMontSalaryApi = async (payload) => {
     setIsLoading(true)
+    console.log(payload)
     try {
       const response = await apiService.apiCreateMonthSalary(payload);
       if (response?.status === 200 && response?.data?.err === 0) {
@@ -282,7 +283,7 @@ const Salary = () => {
                   <button
                     onClick={() => { caculateSalary(salary) }}
                     className="text-green-600 hover:text-green-900" aria-label="Change password">
-                    <CgArrowsExchange className="w-5 h-5" />
+                    <CiCalculator1 className="w-5 h-5" />
                   </button>
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
                     <FiTrash2 className="w-5 h-5" />
@@ -453,6 +454,7 @@ const Salary = () => {
                       onChange={(e) => setCaculate({ ...caculate, month: e.target.value })}
                       className="w-full p-2 border rounded"
                     >
+                      <option value="">Chọn tháng</option>
                       {Array.from({ length: 12 }, (_, index) => {
                         const month = new Date(2020, index); // Use any year (2020) for Date object, as month is zero-indexed
                         return (
