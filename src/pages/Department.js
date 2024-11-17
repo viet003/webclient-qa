@@ -213,7 +213,7 @@ const Department = () => {
             {paginatedDepartments.map((department) => (
               <tr key={department.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{department.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{department.department_name}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{department.department_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{department.createdAt}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{department.updatedAt}</td>
                 <td className="px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">

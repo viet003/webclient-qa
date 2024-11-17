@@ -104,10 +104,10 @@ const Profile = () => {
                 error = !phoneRegex.test(value) ? "Số điện thoại bao gồm 10 chữ số" : "";
                 break;
             case "dependent_number":
-                error = isNaN(value) || value < 0 ? "Số người phụ thuộc phải là số không âm" : "";
+                error = value < 0 ? "Số người phụ thuộc phải là số không âm" : "";
                 break;
             default:
-                error = value.trim() === "" ? "Không được bỏ trống thông tin" : "";
+                error = !Number.isInteger(value) && value.trim() === "" ? "Không được bỏ trống thông tin" : "";
         }
         return error;
     };
