@@ -287,7 +287,7 @@ const Profile = () => {
                                                     value={formData.dependent_number}
                                                     onChange={handleInputChange}
                                                     className={`block w-full px-4 py-3 rounded-lg border ${errors.dob ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
-                                                    disabled={!isEditing}
+                                                    disabled={true}
                                                 />
                                             </div>
                                         </div>
@@ -314,7 +314,7 @@ const Profile = () => {
                                                     value={formData.email}
                                                     onChange={handleInputChange}
                                                     className={`block w-full px-4 py-3 rounded-lg border ${errors.email ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
-                                                    disabled={!isEditing}
+                                                    disabled={true}
                                                 />
                                             </div>
                                         </div>

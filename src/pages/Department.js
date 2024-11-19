@@ -5,6 +5,7 @@ import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
+import { confirm, confirmFunction } from "../ultils/confirmFunction";
 
 const Department = () => {
   const [departments, setDepartments] = useState([]);
@@ -134,8 +135,8 @@ const Department = () => {
     setIsLoading(false)
   };
 
-  const handleDelete = (id) => {
-    handleDeleteApi({ id })
+  const handleDelete = async (id) => {
+    await confirmFunction(() => {handleDeleteApi({ id })})
   };
 
   const handleDeleteApi = async (payload) => {

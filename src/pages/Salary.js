@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
 import { CiCalculator1 } from "react-icons/ci";
+import { confirmFunction } from "../ultils/confirmFunction";
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -160,6 +161,11 @@ const Salary = () => {
   };
 
   const handleDelete = async (id) => {
+    await confirmFunction(() => {handleDeleteApi(id)})
+  };
+
+
+  const handleDeleteApi = async (id) => {
     setIsLoading(true)
     try {
       const response = await apiService.apiDeleteSalary({ id });
@@ -173,7 +179,7 @@ const Salary = () => {
       toast.error("Lỗi khi xóa dữ liệu.");
     }
     setIsLoading(false)
-  };
+  }
 
   const caculateSalary = (salary) => {
     const ob = apiService.getSalaryTax(salary.base_salary, salary.employee.dependent_number);

@@ -5,6 +5,7 @@ import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
+import { confirmFunction } from "../ultils/confirmFunction";
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -113,6 +114,10 @@ const Employee = () => {
   };
 
   const handleDelete = async (id) => {
+    await confirmFunction(() => { handleDeleteApi(id) })
+  };
+
+  const handleDeleteApi = async (id) => {
     setIsLoading(true)
     try {
       const response = await apiService.apiDeleteEmployee({ id });
@@ -126,7 +131,7 @@ const Employee = () => {
       toast.error("Lỗi khi xóa dữ liệu.");
     }
     setIsLoading(false)
-  };
+  }
 
   const handleAdd = async (e) => {
     e.preventDefault();

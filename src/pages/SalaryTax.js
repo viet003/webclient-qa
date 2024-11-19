@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Spinner from './../components/Spinner';
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import { confirmFunction } from "../ultils/confirmFunction";
 
 const SalaryTax = () => {
   const [salarytaxes, setSalarytaxes] = useState([]);
@@ -81,6 +82,10 @@ const SalaryTax = () => {
   };
 
   const handleDelete = async (id) => {
+    await confirmFunction(() => {handleDeleteApi(id)})
+  };
+
+  const handleDeleteApi = async (id) => {
     setIsLoading(true);
     try {
       const response = await apiService.apiDeleteSalaryTax({ id });
@@ -94,7 +99,7 @@ const SalaryTax = () => {
       toast.error("Lỗi khi xóa dữ liệu thuế lương.");
     }
     setIsLoading(false);
-  };
+  }
 
   function formatToVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -120,7 +125,7 @@ const SalaryTax = () => {
           />
         </div>
         <button
-          onClick={() => {}}
+          onClick={() => { }}
           className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           <FiPlusCircle />

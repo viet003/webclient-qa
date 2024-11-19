@@ -6,6 +6,7 @@ import { handleCheckError } from "../ultils/checkFunction"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from './../components/Spinner';
+import { confirmFunction } from "../ultils/confirmFunction";
 
 const Account = () => {
   const [accounts, setAccounts] = useState([]);
@@ -155,6 +156,10 @@ const Account = () => {
   };
 
   const handleDelete = async (id) => {
+    await confirmFunction(() => {handleDeleteApi(id)})
+  };
+
+  const handleDeleteApi = async (id) => {
     setIsLoading(true)
     try {
       const response = await apiService.apiDeleteAccount({ id });
@@ -168,7 +173,7 @@ const Account = () => {
       toast.error("Lỗi khi xóa dữ liệu.");
     }
     setIsLoading(false)
-  };
+  }
 
 
   return (
