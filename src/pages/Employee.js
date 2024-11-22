@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
 import { confirmFunction } from "../ultils/confirmFunction";
+import { handleCheckError } from "../ultils/checkFunction";
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -94,8 +95,38 @@ const Employee = () => {
     setShowModal(true);
   };
 
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (handleCheckError(newEmployee)) return;
+    setIsLoading(true)
+    try {
+      const response = await apiService.apiCreateEmployee(newEmployee);
+      if (response?.status === 200 && response?.data?.err === 0) {
+        setShowAddModal(false);
+        await fetchData();
+        setNewEmployee({
+          full_name: "",
+          dob: "",
+          gender: 1,
+          phone_number: "",
+          address: "",
+          dependent_number: 0,
+          department_id: 0,
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        toast.warn(response?.data?.msg);
+      }
+    } catch (error) {
+      console.error("Error adding data:", error);
+      toast.error("Lỗi khi thêm mới dữ liệu.");
+    }
+    setIsLoading(false)
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
+    if (handleCheckError(editingEmployee)) return;
     setIsLoading(true)
     try {
       const response = await apiService.apiUpdateEmployee(editingEmployee);
@@ -132,34 +163,6 @@ const Employee = () => {
     }
     setIsLoading(false)
   }
-
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    setIsLoading(true)
-    try {
-      const response = await apiService.apiCreateEmployee(newEmployee);
-      if (response?.status === 200 && response?.data?.err === 0) {
-        setShowAddModal(false);
-        await fetchData();
-        setNewEmployee({
-          full_name: "",
-          dob: "",
-          gender: 1,
-          phone_number: "",
-          address: "",
-          dependent_number: 0,
-          department_id: 0,
-          updatedAt: new Date().toISOString(),
-        });
-      } else {
-        toast.warn(response?.data?.msg);
-      }
-    } catch (error) {
-      console.error("Error adding data:", error);
-      toast.error("Lỗi khi thêm mới dữ liệu.");
-    }
-    setIsLoading(false)
-  };
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
@@ -330,8 +333,12 @@ const Employee = () => {
                   <label className="block mt-2 text-sm font-medium text-gray-700">Số người phụ thuộc</label>
                   <input
                     type="number"
+                    min="0"
                     value={editingEmployee.dependent_number}
-                    onChange={(e) => setEditingEmployee({ ...editingEmployee, dependent_number: parseInt(e.target.value) })}
+                    onChange={(e) => setEditingEmployee({
+                      ...editingEmployee,
+                      dependent_number: parseInt(e.target.value) || 0 // Đảm bảo không lưu giá trị NaN
+                    })}
                     className="w-full p-2 border rounded"
                   />
                 </div>
@@ -425,8 +432,14 @@ const Employee = () => {
                   <label className="block mt-2 text-sm font-medium text-gray-700">Số người phụ thuộc</label>
                   <input
                     type="number"
+                    min="0"
                     value={newEmployee.dependent_number}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, dependent_number: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        dependent_number: parseInt(e.target.value) || 0, // Đảm bảo giá trị không là NaN
+                      })
+                    }
                     className="w-full p-2 border rounded"
                   />
                 </div>

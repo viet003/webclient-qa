@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
 import { confirm, confirmFunction } from "../ultils/confirmFunction";
+import { handleCheckError } from "../ultils/checkFunction";
 
 const Department = () => {
   const [departments, setDepartments] = useState([]);
@@ -84,6 +85,7 @@ const Department = () => {
   // thêm mưới
   const handleAdd = (e) => {
     e.preventDefault();
+    if (handleCheckError(newDepartment)) return;
     handleCreateApi(newDepartment);
   };
 
@@ -114,6 +116,7 @@ const Department = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
+    if (handleCheckError(editingDepartment)) return;
     handleUpdateApi(editingDepartment)
   };
 

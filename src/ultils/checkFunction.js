@@ -10,11 +10,20 @@ export const validateField = (name, value) => {
     case "pass_word":
       error = value.length < 8 ? "Mật khẩu phải lớn hơn hoặc bằng 8 ký tự" : "";
       break;
+    case "phone_number":
+      if (!/^\d+$/.test(value)) {
+        error = "Số điện thoại phải là chuỗi số";
+      } else if (value.length < 8) {
+        error = "Số điện thoại phải có ít nhất 8 ký tự";
+      } else {
+        error = ""; // Không có lỗi
+      }
+      break;
     default:
-      // // Check if value is a string, then apply trim; otherwise, check for integer and empty string
-      // error = typeof value === "string" 
-      //   && value.trim() === "" ? `Không được bỏ trống thông tin ${value}` : ""
-      // console.log(value)
+      // Check if value is a string, then apply trim; otherwise, check for integer and empty string
+      error = typeof value === "string" 
+        && value.trim() === "" ? `Không được bỏ trống thông tin ${value}` : ""
+      console.log(value)
       break;
   }
   return error;

@@ -76,13 +76,18 @@ const Login = function () {
       console.log(response)
       if (response?.status === 200 && response?.data?.err === 0) {
         navigator('/main/home')
-        dispatch(actions.state({ active: path.HOME, content: "Trang chủ"}))
+        dispatch(actions.state({ active: path.HOME, content: "Trang chủ" }))
       } else {
         toast.warn(response?.data?.msg)
       }
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsLoading(false);
+    } else {
+      if(!formData.email || !formData.password) {
+        toast.warn('Không được bỏ trống thông tin!')
+        return;
+      }
     }
   };
 
