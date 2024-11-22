@@ -21,7 +21,7 @@ export const getTax = (salaryTax) => {
 };
 
 export const getSalaryTax = (salary, num_dependent) => {
-    if (salary <= 0) {
+    if (salary < 0) {
         toast.warn("Lương cơ bản phải lớn hơn 0"); // Bảo vệ đầu vào
     }
 

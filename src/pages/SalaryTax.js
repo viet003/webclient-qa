@@ -324,10 +324,10 @@ const SalaryTax = () => {
                 </button>
                 <button
                   type="button"
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                  onClick={() => {
-                    handleTryCaculateTax();
-                  }}
+                  className={`px-4 py-2 text-white rounded-md ${openResultCaculateTax ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                  onClick={handleTryCaculateTax}
+                  disabled={openResultCaculateTax}
+                  aria-disabled={openResultCaculateTax}
                 >
                   Tính thuế
                 </button>
