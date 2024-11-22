@@ -21,10 +21,18 @@ const SalaryTax = () => {
 
   const itemsPerPage = 5;
   const [isLoading, setIsLoading] = useState(true);
-
+  const [openCaculateTax, setOpenCaculateTax] = useState(false);
+  const [openResultCaculateTax, setOpenResultCaculateTax] = useState(false)
   const { token } = useSelector(state => state.auth)
   const type = token ? jwtDecode(token) : 0;
   const employee_id = token ? jwtDecode(token) : null
+  const [inputCaculate, setInputCaculate] = useState({
+    salary: 0,
+    depentdent_number: 0,
+    total: 0,
+    tax: 0,
+    deduction: 0,
+  })
 
   useEffect(() => {
     fetchData();
@@ -82,7 +90,7 @@ const SalaryTax = () => {
   };
 
   const handleDelete = async (id) => {
-    await confirmFunction(() => {handleDeleteApi(id)})
+    await confirmFunction(() => { handleDeleteApi(id) })
   };
 
   const handleDeleteApi = async (id) => {
@@ -105,6 +113,12 @@ const SalaryTax = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   }
 
+  const handleTryCaculateTax = () => {
+    const result = apiService.getSalaryTax(inputCaculate.salary, inputCaculate.depentdent_number);
+    setInputCaculate({ ...inputCaculate, deduction: result.deduction, total: result.total_salary, tax: result.tax })
+    setOpenResultCaculateTax(true);
+  }
+
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
@@ -124,13 +138,22 @@ const SalaryTax = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          onClick={() => { }}
-          className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-        >
-          <FiPlusCircle />
-          <span>Quyết toán</span>
-        </button>
+        <div className="flex flex-row gap-5">
+          <button
+            onClick={() => { setOpenCaculateTax(prev => !prev) }}
+            className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            <FiPlusCircle />
+            <span>Thử tính thuế</span>
+          </button>
+          <button
+            onClick={() => { }}
+            className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            <FiPlusCircle />
+            <span>Quyết toán</span>
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -209,6 +232,110 @@ const SalaryTax = () => {
           </button>
         </div>
       </div>
+
+      {openCaculateTax && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="p-6 bg-white rounded-lg w-[700px]">
+            <h2 className="mb-4 text-xl font-bold">Tính thuế thu nhập cá nhân</h2>
+            <form onSubmit={() => { }}>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Lương cơ bản</label>
+                  <input
+                    type="text"
+                    value={inputCaculate.salary}
+                    onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col w-full">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Số người phụ thuộc</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={inputCaculate.depentdent_number}
+                    onChange={(e) => setInputCaculate({
+                      ...inputCaculate,
+                      dependent_number: parseInt(e.target.value) || 0 // Đảm bảo không lưu giá trị NaN
+                    })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+              {
+                openResultCaculateTax && (
+                  <div className="flex flex-row items-start gap-5 space-y-4">
+                    <div className="flex flex-col w-full mt-4">
+                      <label className="block mt-2 text-sm font-medium text-gray-700">Lương cơ bản</label>
+                      <input
+                        type="text"
+                        value={formatToVND(inputCaculate.salary)}
+                        className="w-full p-2 border rounded"
+                        disabled={true}
+                      />
+
+                      <label className="block mt-2 text-sm font-medium text-gray-700">Khoản giảm trừ</label>
+                      <input
+                        type="text"
+                        value={formatToVND(inputCaculate.deduction)}
+                        className="w-full p-2 border rounded"
+                        disabled={true}
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-full">
+                      <label className="block mt-2 text-sm font-medium text-gray-700">Thuế phải nộp</label>
+                      <input
+                        type="text"
+                        value={formatToVND(inputCaculate.tax)}
+                        className="w-full p-2 border rounded"
+                        disabled={true}
+                      />
+
+                      <label className="block mt-2 text-sm font-medium text-gray-700">Lương thực nhận</label>
+                      <input
+                        type="text"
+                        value={formatToVND(inputCaculate.total)}
+                        className="w-full p-2 border rounded"
+                        disabled={true}
+                      />
+                    </div>
+                  </div>
+                )
+              }
+              <div className="flex justify-end mt-4 space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenCaculateTax(false);
+                    setOpenResultCaculateTax(false)
+                    setInputCaculate({
+                      salary: 0,
+                      depentdent_number: 0,
+                      total: 0,
+                      tax: 0,
+                      deduction: 0,
+                    })
+                  }}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Đóng
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  onClick={() => {
+                    handleTryCaculateTax();
+                  }}
+                >
+                  Tính thuế
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
