@@ -22,7 +22,7 @@ export const getTax = (salaryTax) => {
 
 export const getSalaryTax = (salary, num_dependent) => {
     if (salary < 0) {
-        toast.warn("Lương cơ bản phải lớn hơn 0"); // Bảo vệ đầu vào
+        toast.warn("Lương cơ bản phải lớn hơn  0"); // Bảo vệ đầu vào
     }
 
     const _salary = salary / 1000000; // Chuyển sang triệu
