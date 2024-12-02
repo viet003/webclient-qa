@@ -24,8 +24,9 @@ const SalaryTax = () => {
   const [openCaculateTax, setOpenCaculateTax] = useState(false);
   const [openResultCaculateTax, setOpenResultCaculateTax] = useState(false)
   const { token } = useSelector(state => state.auth)
-  const type = token ? jwtDecode(token) : 0;
-  const employee_id = token ? jwtDecode(token) : null
+  const type = token ? jwtDecode(token).type : null;
+  const employee_id = token ? jwtDecode(token).id : null
+  // console.log(employee_id)
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
     depentdent_number: 0,
@@ -40,7 +41,7 @@ const SalaryTax = () => {
 
   const fetchData = async () => {
     try {
-      const salarytaxResponse = await apiService.apiAllMonthSalaries(type === 2 ? { employee_id: employee_id } : {})
+      const salarytaxResponse = await apiService.apiAllMonthSalaries(type === 0 ? { employee_id: employee_id } : {})
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
@@ -119,6 +120,14 @@ const SalaryTax = () => {
     setOpenResultCaculateTax(true);
   }
 
+  const handleTryCaculateTaxOfYear = (id) => {
+    const filtered = salarytaxes
+      .filter(salarytax =>
+        salarytax.id === id
+      )
+      console.log(filtered);
+  }
+
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
       <ToastContainer />
@@ -147,7 +156,7 @@ const SalaryTax = () => {
             <span>Thử tính thuế</span>
           </button>
           <button
-            onClick={() => { }}
+            onClick={() => {handleTryCaculateTaxOfYear(employee_id)}}
             className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
           >
             <FiPlusCircle />
@@ -257,7 +266,7 @@ const SalaryTax = () => {
                     value={inputCaculate.depentdent_number}
                     onChange={(e) => setInputCaculate({
                       ...inputCaculate,
-                      dependent_number: parseInt(e.target.value) || 0 // Đảm bảo không lưu giá trị NaN
+                      depentdent_number: parseInt(e.target.value) // Đảm bảo không lưu giá trị NaN
                     })}
                     className="w-full p-2 border rounded"
                   />

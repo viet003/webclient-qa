@@ -37,6 +37,7 @@ const SideBar = (props) => {
 
     useEffect(() => {
         setActiveItem(active);
+        console.log(type);
     }, [active]);
 
     return (
@@ -57,7 +58,7 @@ const SideBar = (props) => {
                     <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Thông tin</div>
                 </div>
                 {
-                    type && type !== 0 && (
+                    type !== 0 && (
                         <div
                             onClick={() => handleNavigation("Quản lý nhân viên", path.EMPLOYEE)}
                             className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.EMPLOYEE ? "text-black bg-white" : ""}`}

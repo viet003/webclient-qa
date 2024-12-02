@@ -248,7 +248,7 @@ const Profile = () => {
                                                     type="text"
                                                     id="dob"
                                                     name="dob"
-                                                    value={formData.dob}
+                                                    value={new Date(formData.dob)}
                                                     onChange={handleInputChange}
                                                     className={`block w-full px-4 py-3 rounded-lg border ${errors.dob ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                                                     disabled={!isEditing}

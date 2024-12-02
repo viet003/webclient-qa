@@ -1,5 +1,4 @@
 import React from "react";
-import admin from "../assets/admin.jpg"
 import user from "../assets/user.jpg"
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -7,7 +6,6 @@ import { jwtDecode } from "jwt-decode";
 const UserProfile = ({ toggle }) => {
 
     const { token } = useSelector(state => state.auth)
-    const id = token ? jwtDecode(token).id : "No user"
     const name = token ? jwtDecode(token).name : "Guest"
     const type = token ? jwtDecode(token).type : ""
     // console.log(jwtDecode(token).name)
