@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
 import { confirmFunction } from "../ultils/confirmFunction";
 import { handleCheckError } from "../ultils/checkFunction";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -22,7 +24,7 @@ const Employee = () => {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-
+  
   const [isLoading, setIsLoading] = useState(true)
   const [newEmployee, setNewEmployee] = useState({
     full_name: "",
@@ -35,14 +37,20 @@ const Employee = () => {
     updatedAt: new Date().toISOString(),
   });
 
+  const { token } = useSelector(state => state.auth);
+  const department_id = token ? jwtDecode(token)?.department_id : null;
+  const type = token ? jwtDecode(token)?.type : 0;
+
+
   useEffect(() => {
     fetchData();
-  }, []);
+    console.log(department_id)
+  }, [department_id]);
 
   const fetchData = async () => {
     try {
       const [employeeResponse, departmentResponse] = await Promise.all([
-        apiService.apiAllEmployees(),
+        apiService.apiAllEmployees(type === 1 ? { department_id: department_id } : {}),
         apiService.apiAllDepartment()
       ]);
 

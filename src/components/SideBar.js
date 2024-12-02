@@ -37,7 +37,7 @@ const SideBar = (props) => {
 
     useEffect(() => {
         setActiveItem(active);
-        console.log(type);
+        // console.log(type);
     }, [active]);
 
     return (

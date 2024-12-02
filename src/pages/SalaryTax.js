@@ -25,8 +25,9 @@ const SalaryTax = () => {
   const [openResultCaculateTax, setOpenResultCaculateTax] = useState(false)
   const { token } = useSelector(state => state.auth)
   const type = token ? jwtDecode(token).type : null;
-  const employee_id = token ? jwtDecode(token).id : null
-  // console.log(employee_id)
+  const employee_id = token ? jwtDecode(token).employee_id : null
+  console.log(employee_id)
+  const [salaryOfYear, setSalaryOfYear] = useState([])
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
     depentdent_number: 0,
@@ -45,6 +46,7 @@ const SalaryTax = () => {
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
+        console.log(salarytaxResponse.data.data)
       } else {
         toast.warn("Không thể tải dữ liệu.");
       }
@@ -125,8 +127,34 @@ const SalaryTax = () => {
       .filter(salarytax =>
         salarytax.id === id
       )
-      console.log(filtered);
+    console.log(filtered);
   }
+
+  // handle quyết toán
+  const handleQT = () => {
+    let a = [];
+    for (let i = 0; i < 12; i++) {
+      a.push({
+        "month": `${i + 1}`,
+        "total_salary": ""
+      });
+    }
+    return a;
+  }
+
+  useEffect(() => {
+    const a = handleQT();
+    if (type !== 2) {
+      salarytaxes.forEach((item) => {
+        const monthIndex = a.findIndex(monthItem => monthItem.month === item.month);
+        if (monthIndex !== -1) {
+          a[monthIndex].total_salary = item.total_salary;
+        }
+      })
+    }
+    setSalaryOfYear(a)
+    console.log(a);
+  }, [salarytaxes])
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
@@ -156,7 +184,7 @@ const SalaryTax = () => {
             <span>Thử tính thuế</span>
           </button>
           <button
-            onClick={() => {handleTryCaculateTaxOfYear(employee_id)}}
+            onClick={() => { handleTryCaculateTaxOfYear(employee_id) }}
             className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
           >
             <FiPlusCircle />
@@ -203,7 +231,7 @@ const SalaryTax = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.month}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.year}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {formatToVND(salary.employee.salaries[0]?.base_salary)}
+                  {formatToVND(salary.employee.salary?.base_salary)}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.deduction)}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.total_salary)}</td>

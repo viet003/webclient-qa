@@ -33,7 +33,7 @@ export const apiUpdateInfor = (payload) => new Promise((resolve, reject) => {
 export const apiAllEmployees = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
-            method: 'get',
+            method: 'post',
             url: 'api/employee',
             data: payload
         })
