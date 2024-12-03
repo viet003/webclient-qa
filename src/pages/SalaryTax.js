@@ -28,6 +28,7 @@ const SalaryTax = () => {
   const employee_id = token ? jwtDecode(token).employee_id : null
   console.log(employee_id)
   const [salaryOfYear, setSalaryOfYear] = useState([])
+  const [yearTarget, setYearTarget] = useState('2024');
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
     depentdent_number: 0,
@@ -38,11 +39,11 @@ const SalaryTax = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [yearTarget]);
 
   const fetchData = async () => {
     try {
-      const salarytaxResponse = await apiService.apiAllMonthSalaries(type === 0 ? { employee_id: employee_id } : {})
+      const salarytaxResponse = await apiService.apiAllMonthSalaries(type === 0 ? { employee_id: employee_id, year: yearTarget } : { year: yearTarget })
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
@@ -122,39 +123,59 @@ const SalaryTax = () => {
     setOpenResultCaculateTax(true);
   }
 
+  // thử tính thuế
   const handleTryCaculateTaxOfYear = (id) => {
-    const filtered = salarytaxes
-      .filter(salarytax =>
-        salarytax.id === id
-      )
-    console.log(filtered);
+    if (type !== 2) {
+      const filldata = handleQT(); // Tạo dữ liệu ban đầu
+      handleFillTaxOfYear(filldata, salarytaxes, salarytaxes[0]?.employee.salary.base_salary, salarytaxes[0]?.employee.dependent_number);
+    }
+    // console.log(filtered);
   }
 
-  // handle quyết toán
-  const handleQT = () => {
-    let a = [];
-    for (let i = 0; i < 12; i++) {
-      a.push({
-        "month": `${i + 1}`,
-        "total_salary": ""
-      });
-    }
-    return a;
+  // quyết toán thuế
+  const handleFillTaxOfYear = (filldata, data, salary, dependent_number) => {
+    // Cập nhật thông tin thuế cho các tháng có dữ liệu
+    data.forEach(item => {
+      const monthIndex = filldata.findIndex((obj) => obj.month === item.month);
+      if (monthIndex !== -1) {
+        filldata[monthIndex] = {
+          month: item.month,
+          salary: item?.employee.salary.base_salary,
+          total_salary: item.total_salary,
+        };
+      }
+    });
+
+    const caculate = apiService.getSalaryTax(salary, dependent_number);
+    // Thêm các tháng chưa có dữ liệu vào mảng
+    filldata.forEach((item) => {
+      if (item.total_salary === '') {
+        item.salary = caculate.salary;
+        item.total_salary = caculate.total_salary;
+      }
+    });
+
+    setSalaryOfYear(filldata);
   }
+
+  const handleQT = () => {
+    const array = [];
+    for (let i = 1; i <= 12; i++) {
+      array.push({ month: `${i}`, salary: "", total_salary: "" });
+    }
+    return array;
+  };
+
+  // useEffect(() => {
+  //   if (type !== 2) {
+  //     const filldata = handleQT(); // Tạo dữ liệu ban đầu
+  //     handleFillTaxOfYear(filldata, salarytaxes, salarytaxes[0]?.employee.salary.base_salary, salarytaxes[0]?.employee.dependent_number);
+  //   }
+  // }, [salarytaxes]);
 
   useEffect(() => {
-    const a = handleQT();
-    if (type !== 2) {
-      salarytaxes.forEach((item) => {
-        const monthIndex = a.findIndex(monthItem => monthItem.month === item.month);
-        if (monthIndex !== -1) {
-          a[monthIndex].total_salary = item.total_salary;
-        }
-      })
-    }
-    setSalaryOfYear(a)
-    console.log(a);
-  }, [salarytaxes])
+    console.log(salaryOfYear);
+  }, [salaryOfYear]);
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
@@ -165,15 +186,32 @@ const SalaryTax = () => {
         message="Loading....."
       />
       <div className="flex items-center justify-between mb-4">
-        <div className="relative">
-          <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên..."
-            className="py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-row items-center justify-center gap-5">
+          <div className="relative">
+            <FiSearch className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên..."
+              className="py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="h-full">
+            <select
+              id="year"
+              name="year"
+              value={yearTarget}
+              onChange={(e) => { setYearTarget(e.target.value); setIsLoading(true) }}
+              className="flex text-gray-600 justify-center items-center h-[41px] px-5 transition-colors duration-200 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              {['2024', '2025', '2026', '2027'].map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="flex flex-row gap-5">
           <button

@@ -38,3 +38,15 @@ export const getSalaryTax = (salary, num_dependent) => {
         total_salary: Math.round(total_salary * 1000000) // Làm tròn lương thực nhận
     };
 };
+
+export const getSalaryTaxOfYear = (data) => {
+
+    let _salary = 0; // Chuyển sang triệu
+    let _total_salary = 0;
+    data.forEach((item) => {
+        _salary += item.salary;
+        _total_salary += item.total_salary;
+    })
+};
+
+

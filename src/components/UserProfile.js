@@ -17,12 +17,12 @@ const UserProfile = ({ toggle }) => {
             <div className={toggle ? "opacity-0 transition-opacity text-white" : "opacity-100 duration-300"}>
                 {
                     true && (
-                        <p className="overflow-hidden text-sm whitespace-no-wrap overflow-ellipsis">{name}</p>
+                        <p className="overflow-hidden text-sm">{`Hi, ${name.split(' ').slice(2).join(' ')}`}</p>
                     )
                 }
                 {
                     type === "Quản trị viên" && (
-                        <p className="overflow-hidden text-sm whitespace-no-wrap overflow-ellipsis">Admin</p>
+                        <p className="overflow-hidden text-sm">Admin</p>
                     )
                 }
                 <p className="text-[0.75rem] opacity-60 mt-1">

@@ -3,13 +3,14 @@ import { Login, ForgotPass, Main, Profile, Employee, Department, Home, Account, 
 import { path } from "./ultils/containts";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkTokenExpired } from "./services";
 import * as actions from "./store/actions"
+import { Spinner } from "./components";
 
 function App() {
-
-  const { isLoggedIn, token } = useSelector(state => state.auth);
+  const [isLoading, setIsLoading] = useState(true)
+  const { token } = useSelector(state => state.auth);
   const type = token ? jwtDecode(token)?.type : 0;
   const navigator = useNavigate()
   const dispatch = useDispatch()
@@ -21,24 +22,30 @@ function App() {
         dispatch(actions.logout());
         return;
       }
-      if (rs.status >= 400 && rs.status <=500) {
+      if (rs.status >= 400 && rs.status <= 500) {
         navigator(path.LOGIN);
         return;
       }
     } catch (error) {
       console.log(error)
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
     checkToken()
-  }, [])
+  }, [token])
 
   return (
     <div>
+      <Spinner
+        isOpen={isLoading}
+        onClose={() => setIsLoading(false)}
+        message="Loading....."
+      />
       <Routes>
         <Route exact path={path.LOGIN} element={<Login />} />
-        <Route path={path.MAIN} element={isLoggedIn ? <Main /> : <Navigate to={path.LOGIN} />}>
+        <Route path={path.MAIN} element={token ? <Main /> : <Navigate to={path.LOGIN} />}>
           <Route path={path.HOME} element={<Home />} />
           <Route path={path.PROFILE} element={<Profile />} />
           <Route path={path.TAX} element={<SalaryTax />} />
