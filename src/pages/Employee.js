@@ -430,7 +430,7 @@ const Employee = () => {
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Chọn phòng ban</option>
-                    {departments.map((department) => (
+                    {departments.filter((val) => val.id === department_id).map((department) => (
                       <option key={department.id} value={department.id}>
                         {department.department_name}
                       </option>

@@ -54,7 +54,7 @@ const SalaryTax = () => {
 
   const fetchData = async () => {
     try {
-      const salarytaxResponse = await apiService.apiAllMonthSalaries(type === 0 ? { employee_id: employee_id, year: yearTarget } : { year: yearTarget })
+      const salarytaxResponse = await apiService.apiAllMonthSalaries(type !== 2 ? { employee_id: employee_id, year: yearTarget } : { year: yearTarget })
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
