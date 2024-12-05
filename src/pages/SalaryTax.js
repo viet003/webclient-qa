@@ -328,9 +328,11 @@ const SalaryTax = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.total_salary)}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.tax)}</td>
                 <td className="flex justify-center px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
-                  <button onClick={() => handleTryCaculateTaxOfYear(salary.employee_id)} className="text-green-600 hover:text-green-900" aria-label="Delete salary">
+                 {
+                  type === 2 ? ( <button onClick={() => handleTryCaculateTaxOfYear(salary.employee_id)} className="text-green-600 hover:text-green-900" aria-label="Delete salary">
                     <CiCalculator1 className="w-5 h-5" />
-                  </button>
+                  </button>) :(<></>)
+                 }
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
                     <FiTrash2 className="w-5 h-5" />
                   </button>
