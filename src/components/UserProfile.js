@@ -17,7 +17,7 @@ const UserProfile = ({ toggle }) => {
             <div className={toggle ? "opacity-0 transition-opacity text-white" : "opacity-100 duration-300"}>
                 {
                     true && (
-                        <p className="overflow-hidden text-sm">{`Hi, ${name.split(' ').slice(2).join(' ')}`}</p>
+                        <p className="overflow-hidden text-sm">{name.split(' ').length > 2 ? `Hi, ${name.split(' ').slice(2).join(' ')}` : `Hi, ${name}`}</p>
                     )
                 }
                 {

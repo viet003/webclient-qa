@@ -45,17 +45,17 @@ export const getTaxByYear = (salaryTax) => {
         case salaryTax <= 60:
             return 0.05 * salaryTax;
         case salaryTax <= 120:
-            return 0.10 * salaryTax;
+            return 0.10 * salaryTax - 3;
         case salaryTax <= 216:
-            return 0.15 * salaryTax;
+            return 0.15 * salaryTax - 9;
         case salaryTax <= 384:
-            return 0.20 * salaryTax;
+            return 0.20 * salaryTax - 19.8;
         case salaryTax <= 624:
-            return 0.25 * salaryTax;
+            return 0.25 * salaryTax - 39;
         case salaryTax <= 960:
-            return 0.30 * salaryTax;
+            return 0.30 * salaryTax - 70.2;
         default:
-            return 0.35 * salaryTax; // Xử lý trường hợp lớn hơn 80
+            return 0.35 * salaryTax - 118.2; // Xử lý trường hợp lớn hơn 80
     }
 };
 

@@ -28,8 +28,8 @@ const SalaryTax = () => {
   const { token } = useSelector(state => state.auth)
   const type = token ? jwtDecode(token).type : null;
   const employee_id = token ? jwtDecode(token).employee_id : null
-  console.log(employee_id)
-  const [yearTarget, setYearTarget] = useState('2024');
+  // console.log(employee_id)
+  const [yearTarget, setYearTarget] = useState(new Date().getFullYear().toString());
 
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
@@ -162,8 +162,7 @@ const SalaryTax = () => {
       console.log(salaryRes)
       const data = type !== 2 ?
         handleFillTaxOfYear(filldata, salarytaxes, salaryRes?.base_salary, salaryRes?.employee.dependent_number) :
-        handleFillTaxOfYear(filldata, [], salaryRes?.base_salary, salaryRes?.employee.dependent_number);
-
+        handleFillTaxOfYear(filldata, salarytaxes.filter((val) => val.employee_id === employee_id), salaryRes?.base_salary, salaryRes?.employee.dependent_number);
       const rs = apiService.getSalaryTaxOfYear(data);
       console.log(data, rs);
 
@@ -188,13 +187,14 @@ const SalaryTax = () => {
 
   // quyết toán thuế
   const handleFillTaxOfYear = (filldata, data, salary, dependent_number) => {
+    console.log(data)
     // Cập nhật thông tin thuế cho các tháng có dữ liệu
     data.forEach(item => {
       const monthIndex = filldata.findIndex((obj) => obj.month === item.month);
       if (monthIndex !== -1) {
         filldata[monthIndex] = {
           month: item.month,
-          salary: item?.employee.salary.base_salary,
+          salary: item?.salary,
           deduction: item?.deduction,
           tax: item?.tax
         };
@@ -293,7 +293,7 @@ const SalaryTax = () => {
                 { label: "Phòng ban", key: "employee.department.department_name" },
                 { label: "Tháng", key: "month" },
                 { label: "Năm", key: "year" },
-                { label: "Lương cơ bản", key: "employee.salaries[0].base_salary" },
+                { label: "Lương", key: "employee.salaries[0].base_salary" },
                 { label: "Khấu trừ", key: "deduction" },
                 { label: "Lương nhận", key: "total_salary" },
                 { label: "Thuế", key: "tax" }
@@ -322,7 +322,7 @@ const SalaryTax = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.month}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.year}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                  {formatToVND(salary.employee.salary?.base_salary)}
+                  {formatToVND(salary?.salary)}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.deduction)}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.total_salary)}</td>

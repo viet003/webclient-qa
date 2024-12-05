@@ -30,6 +30,7 @@ const Salary = () => {
     full_name: "",
     month: "",
     year: "",
+    salary: 0,
     deduction: 0,
     tax: 0,
     total_salary: 0
@@ -184,7 +185,7 @@ const Salary = () => {
   const caculateSalary = (salary) => {
     const ob = apiService.getSalaryTax(salary.base_salary, salary.employee.dependent_number);
     console.log(ob)
-    setCaculate({ ...caculate, employee_id: salary.employee.id, full_name: salary.employee.full_name, deduction: ob.deduction, tax: ob.tax, total_salary: ob.total_salary })
+    setCaculate({ ...caculate, employee_id: salary.employee.id, full_name: salary.employee.full_name, salary: salary.base_salary, deduction: ob.deduction, tax: ob.tax, total_salary: ob.total_salary })
     setOpenCaculate(true)
   }
 
@@ -205,6 +206,7 @@ const Salary = () => {
           full_name: "",
           month: "",
           year: "",
+          salary: 0,
           deduction: 0,
           tax: 0,
           total_salary: 0

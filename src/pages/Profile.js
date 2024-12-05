@@ -245,10 +245,10 @@ const Profile = () => {
                                             </label>
                                             <div className="relative mt-1">
                                                 <input
-                                                    type="text"
+                                                    type="date"
                                                     id="dob"
                                                     name="dob"
-                                                    value={new Date(formData.dob)}
+                                                    value={formData.dob}
                                                     onChange={handleInputChange}
                                                     className={`block w-full px-4 py-3 rounded-lg border ${errors.dob ? "border-red-500" : "border-gray-300"} focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                                                     disabled={!isEditing}
