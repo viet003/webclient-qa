@@ -1,11 +1,25 @@
 import axiosConfig from "../axiosConfig";
 
-//  lấy thông tin phòng ban
+//  lấy thông tin lương
 export const apiAllSalaries = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
             method: 'get',
             url: 'api/salary',
+            data: payload
+        })
+        resolve(response)
+    } catch (error) {
+        reject(error)
+    }
+})
+
+//  lấy thông tin lương của nhân viên chỉ định
+export const apiSalaryByEmployee = (payload) => new Promise((resolve, reject) => {
+    try {
+        const response = axiosConfig({
+            method: 'post',
+            url: 'api/salary/employee',
             data: payload
         })
         resolve(response)

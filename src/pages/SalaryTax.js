@@ -9,6 +9,7 @@ import Spinner from './../components/Spinner';
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { confirmFunction } from "../ultils/confirmFunction";
+import { CiCalculator1 } from "react-icons/ci";
 
 const SalaryTax = () => {
   const [salarytaxes, setSalarytaxes] = useState([]);
@@ -22,19 +23,29 @@ const SalaryTax = () => {
   const itemsPerPage = 5;
   const [isLoading, setIsLoading] = useState(true);
   const [openCaculateTax, setOpenCaculateTax] = useState(false);
+  const [openCaculateTaxByYear, setOpenCaculateTaxByYear] = useState(false);
   const [openResultCaculateTax, setOpenResultCaculateTax] = useState(false)
   const { token } = useSelector(state => state.auth)
   const type = token ? jwtDecode(token).type : null;
   const employee_id = token ? jwtDecode(token).employee_id : null
   console.log(employee_id)
-  const [salaryOfYear, setSalaryOfYear] = useState([])
   const [yearTarget, setYearTarget] = useState('2024');
+
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
     depentdent_number: 0,
     total: 0,
     tax: 0,
     deduction: 0,
+  })
+
+  const [inputCaculateByYear, setInputCaculateByYear] = useState({
+    total_salary: 0,
+    total_deduction: 0,
+    total_tax_month: 0,
+    tax_year: 0,
+    bol: true,
+    result: 0,
   })
 
   useEffect(() => {
@@ -47,7 +58,7 @@ const SalaryTax = () => {
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
-        console.log(salarytaxResponse.data.data)
+        // console.log(salarytaxResponse.data.data)
       } else {
         toast.warn("Không thể tải dữ liệu.");
       }
@@ -57,6 +68,24 @@ const SalaryTax = () => {
     }
     setIsLoading(false);
   };
+
+
+  const geSalaryOfEmployee = async (id) => {
+    try {
+      const salarytaxResponse = await apiService.apiSalaryByEmployee({ employee_id: id })
+
+      if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
+        return salarytaxResponse.data.data;
+      } else {
+        toast.warn("Có lỗi xảy ra. Vui lòng thử lại sau!");
+        return;
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại sau!");
+    }
+  };
+
 
   useEffect(() => {
     const filtered = salarytaxes
@@ -117,17 +146,42 @@ const SalaryTax = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   }
 
+  //thử tính thuế
   const handleTryCaculateTax = () => {
     const result = apiService.getSalaryTax(inputCaculate.salary, inputCaculate.depentdent_number);
     setInputCaculate({ ...inputCaculate, deduction: result.deduction, total: result.total_salary, tax: result.tax })
     setOpenResultCaculateTax(true);
   }
 
-  // thử tính thuế
-  const handleTryCaculateTaxOfYear = (id) => {
-    if (type !== 2) {
+  // quyết toán 
+  const handleTryCaculateTaxOfYear = async (employee_id) => {
+    try {
+      setIsLoading(true)
       const filldata = handleQT(); // Tạo dữ liệu ban đầu
-      handleFillTaxOfYear(filldata, salarytaxes, salarytaxes[0]?.employee.salary.base_salary, salarytaxes[0]?.employee.dependent_number);
+      const salaryRes = await geSalaryOfEmployee(employee_id)
+      console.log(salaryRes)
+      const data = type !== 2 ?
+        handleFillTaxOfYear(filldata, salarytaxes, salaryRes?.base_salary, salaryRes?.employee.dependent_number) :
+        handleFillTaxOfYear(filldata, [], salaryRes?.base_salary, salaryRes?.employee.dependent_number);
+
+      const rs = apiService.getSalaryTaxOfYear(data);
+      console.log(data, rs);
+
+      setInputCaculateByYear({
+        total_salary: rs.total_salary,
+        total_deduction: rs.total_deduction,
+        total_tax_month: rs.total_tax_month,
+        tax_year: rs.tax_year,
+        bol: rs.bol,
+        result: rs.result,
+      })
+
+    } catch (error) {
+      console.log(error)
+      toast.warn("Có lỗi xảy ra. Vui lòng thử lại sau!!")
+    } finally {
+      setIsLoading(false);
+      setOpenCaculateTaxByYear(prev => !prev);
     }
     // console.log(filtered);
   }
@@ -141,7 +195,8 @@ const SalaryTax = () => {
         filldata[monthIndex] = {
           month: item.month,
           salary: item?.employee.salary.base_salary,
-          total_salary: item.total_salary,
+          deduction: item?.deduction,
+          tax: item?.tax
         };
       }
     });
@@ -149,33 +204,29 @@ const SalaryTax = () => {
     const caculate = apiService.getSalaryTax(salary, dependent_number);
     // Thêm các tháng chưa có dữ liệu vào mảng
     filldata.forEach((item) => {
-      if (item.total_salary === '') {
+      if (item.deduction === '') {
         item.salary = caculate.salary;
-        item.total_salary = caculate.total_salary;
+        item.deduction = caculate.deduction;
+        item.tax = caculate.tax;
       }
     });
 
-    setSalaryOfYear(filldata);
+    return filldata;
   }
 
   const handleQT = () => {
     const array = [];
     for (let i = 1; i <= 12; i++) {
-      array.push({ month: `${i}`, salary: "", total_salary: "" });
+      array.push(
+        {
+          month: `${i}`,
+          salary: "", deduction: "",
+          tax: ''
+        }
+      );
     }
     return array;
   };
-
-  // useEffect(() => {
-  //   if (type !== 2) {
-  //     const filldata = handleQT(); // Tạo dữ liệu ban đầu
-  //     handleFillTaxOfYear(filldata, salarytaxes, salarytaxes[0]?.employee.salary.base_salary, salarytaxes[0]?.employee.dependent_number);
-  //   }
-  // }, [salarytaxes]);
-
-  useEffect(() => {
-    console.log(salaryOfYear);
-  }, [salaryOfYear]);
 
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow-lg">
@@ -221,13 +272,15 @@ const SalaryTax = () => {
             <FiPlusCircle />
             <span>Thử tính thuế</span>
           </button>
-          <button
-            onClick={() => { handleTryCaculateTaxOfYear(employee_id) }}
-            className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-          >
-            <FiPlusCircle />
-            <span>Quyết toán</span>
-          </button>
+          {
+            type !== 2 ? (<button
+              onClick={() => { handleTryCaculateTaxOfYear(employee_id) }}
+              className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              <FiPlusCircle />
+              <span>Quyết toán</span>
+            </button>) : (<></>)
+          }
         </div>
       </div>
 
@@ -275,6 +328,9 @@ const SalaryTax = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.total_salary)}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.tax)}</td>
                 <td className="flex justify-center px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
+                  <button onClick={() => handleTryCaculateTaxOfYear(salary.employee_id)} className="text-green-600 hover:text-green-900" aria-label="Delete salary">
+                    <CiCalculator1 className="w-5 h-5" />
+                  </button>
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
                     <FiTrash2 className="w-5 h-5" />
                   </button>
@@ -411,6 +467,103 @@ const SalaryTax = () => {
           </div>
         </div>
       )}
+
+      {openCaculateTaxByYear && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="p-6 bg-white rounded-lg w-[700px]">
+            <h2 className="mb-4 text-xl font-bold">Ước tính quyết toán thuế cuối năm</h2>
+            <form onSubmit={() => { }}>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Tổng lương cả năm</label>
+                  <input
+                    type="text"
+                    value={formatToVND(inputCaculateByYear.total_salary)}
+                    // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Tổng các khoản giảm trừ</label>
+                  <input
+                    type="text"
+                    value={formatToVND(inputCaculateByYear.total_deduction)}
+                    // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Thu nhập chịu thuế theo năm</label>
+                  <input
+                    type="text"
+                    value={formatToVND(apiService.customRound(inputCaculateByYear.total_salary - inputCaculateByYear.total_deduction))}
+                    // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row items-start gap-5 space-y-4">
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Thuế theo thu nhập cả năm</label>
+                  <input
+                    type="text"
+                    value={formatToVND(inputCaculateByYear.tax_year)}
+                    // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col w-full mt-4">
+                  <label className="block mt-2 text-sm font-medium text-gray-700">Tổng thuế thu nhập của các tháng</label>
+                  <input
+                    type="text"
+                    value={formatToVND(inputCaculateByYear.total_tax_month)}
+                    // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex flex-row items-start gap-5 space-y-4">
+                  <div className="flex flex-col w-full mt-4">
+                    <label className="block mt-2 text-sm font-medium text-gray-700">{inputCaculateByYear?.bol ? "Truy thu" : "Truy nhận"}</label>
+                    <input
+                      type="text"
+                      value={formatToVND(inputCaculateByYear.result)}
+                      // onChange={(e) => setInputCaculate({ ...inputCaculate, salary: e.target.value })}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end mt-4 space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenCaculateTaxByYear(false);
+                    // setOpenResultCaculateTax(false)
+                    setInputCaculateByYear({
+                      total_salary: 0,
+                      total_deduction: 0,
+                      total_tax_month: 0,
+                      tax_year: 0,
+                      bol: true,
+                      result: 0,
+                    })
+                  }}
+                  className="px-4 py-2 text-white bg-blue-600 border rounded-md hover:bg-blue-700"
+                >
+                  Đóng
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
