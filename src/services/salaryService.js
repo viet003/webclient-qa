@@ -4,7 +4,7 @@ import axiosConfig from "../axiosConfig";
 export const apiAllSalaries = (payload) => new Promise((resolve, reject) => {
     try {
         const response = axiosConfig({
-            method: 'get',
+            method: 'post',
             url: 'api/salary',
             data: payload
         })

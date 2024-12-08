@@ -5,7 +5,7 @@ import * as apiService from "../services";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
-import { confirm, confirmFunction } from "../ultils/confirmFunction";
+import { confirmFunction } from "../ultils/confirmFunction";
 import { handleCheckError } from "../ultils/checkFunction";
 
 const Department = () => {

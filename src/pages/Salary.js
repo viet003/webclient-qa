@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Spinner from "../components/Spinner";
 import { CiCalculator1 } from "react-icons/ci";
 import { confirmFunction } from "../ultils/confirmFunction";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -35,6 +37,11 @@ const Salary = () => {
     tax: 0,
     total_salary: 0
   })
+
+  const { token } = useSelector(state => state.auth);
+  const department_id = token ? jwtDecode(token)?.department_id : null;
+  const type = token ? jwtDecode(token)?.type : 2;
+
   const [newSalary, setNewSalary] = useState({
     employee_id: "",
     base_salary: 0,
@@ -42,7 +49,8 @@ const Salary = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    console.log(department_id)
+  }, [department_id]);
 
   function formatToVND(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -51,7 +59,7 @@ const Salary = () => {
   const fetchData = async () => {
     try {
       const [salaryResponse, employeeResponse] = await Promise.all([
-        apiService.apiAllSalaries(),
+        apiService.apiAllSalaries(type === 1 ? { department_id: department_id } : {}),
         apiService.apiAllWithoutSalary()
       ]);
 
@@ -162,7 +170,7 @@ const Salary = () => {
   };
 
   const handleDelete = async (id) => {
-    await confirmFunction(() => {handleDeleteApi(id)})
+    await confirmFunction(() => { handleDeleteApi(id) })
   };
 
 
@@ -241,13 +249,17 @@ const Salary = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-        >
-          <FiPlusCircle />
-          <span>Thêm mới</span>
-        </button>
+        {
+          type === 2 && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              <FiPlusCircle />
+              <span>Thêm mới</span>
+            </button>
+          )
+        }
       </div>
 
       <div className="overflow-x-auto">
@@ -271,9 +283,13 @@ const Salary = () => {
                     </div>
                   </th>
                 ))}
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                Hành động
-              </th>
+              {
+                type === 2 && (
+                  <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                    Hành động
+                  </th>
+                )
+              }
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -284,19 +300,23 @@ const Salary = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.employee.department.department_name}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{salary.employee.dependent_number}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.base_salary)}</td>
-                <td className="px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
-                  <button onClick={() => handleEdit(salary)} className="text-blue-600 hover:text-blue-900" aria-label="Edit salary">
-                    <FiEdit2 className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => { caculateSalary(salary) }}
-                    className="text-green-600 hover:text-green-900" aria-label="Change password">
-                    <CiCalculator1 className="w-5 h-5" />
-                  </button>
-                  <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
-                    <FiTrash2 className="w-5 h-5" />
-                  </button>
-                </td>
+                {
+                  type === 2 && (
+                    <td className="px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
+                      <button onClick={() => handleEdit(salary)} className="text-blue-600 hover:text-blue-900" aria-label="Edit salary">
+                        <FiEdit2 className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => { caculateSalary(salary) }}
+                        className="text-green-600 hover:text-green-900" aria-label="Change password">
+                        <CiCalculator1 className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
+                        <FiTrash2 className="w-5 h-5" />
+                      </button>
+                    </td>
+                  )
+                }
               </tr>
             ))}
           </tbody>

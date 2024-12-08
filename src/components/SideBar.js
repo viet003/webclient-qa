@@ -85,13 +85,17 @@ const SideBar = (props) => {
                                 <div className="mr-8 text-[1.7rem]"><RiAccountPinBoxFill /></div>
                                 <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Tài khoản</div>
                             </div>
-                            <div
-                                onClick={() => handleNavigation("Quản lý bảng lương", path.SALARY)}
-                                className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.SALARY ? "text-black bg-white" : ""}`}
-                            >
-                                <div className="mr-8 text-[1.7rem]"><TbReportMoney /></div>
-                                <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Bảng lương</div>
-                            </div>
+                        </div>
+                    )
+                }
+                {
+                    type !== 0 && (
+                        <div
+                            onClick={() => handleNavigation("Quản lý bảng lương", path.SALARY)}
+                            className={`${toggle ? "w-[3.5rem]" : "w-[12rem]"} sideData ${activeItem === path.SALARY ? "text-black bg-white" : ""}`}
+                        >
+                            <div className="mr-8 text-[1.7rem]"><TbReportMoney /></div>
+                            <div className={`${toggle ? "opacity-0 " : "transition-opacity "} text-[14px] whitespace-pre`}>Bảng lương</div>
                         </div>
                     )
                 }

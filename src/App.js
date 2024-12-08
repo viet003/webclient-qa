@@ -52,7 +52,7 @@ function App() {
           <Route path={path.ACCOUNT} element={type === 2 ? <Account /> : <Home />} />
           <Route path={path.EMPLOYEE} element={type !== 0 ? <Employee /> : <Home />} />
           <Route path={path.DEPARTMENT} element={type === 2 ? <Department /> : <Home />} />
-          <Route path={path.SALARY} element={type === 2 ? <Salary /> : <Home />} />
+          <Route path={path.SALARY} element={type !== 0 ? <Salary /> : <Home />} />
           <Route path={path.STAR} element={<Home />} />
         </Route>
         <Route path={path.FORGOTPASS} element={<ForgotPass />} />

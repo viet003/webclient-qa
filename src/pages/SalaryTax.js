@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { confirmFunction } from "../ultils/confirmFunction";
 import { CiCalculator1 } from "react-icons/ci";
+import { months } from "../ultils/items";
 
 const SalaryTax = () => {
   const [salarytaxes, setSalarytaxes] = useState([]);
@@ -30,6 +31,7 @@ const SalaryTax = () => {
   const employee_id = token ? jwtDecode(token).employee_id : null
   // console.log(employee_id)
   const [yearTarget, setYearTarget] = useState(new Date().getFullYear().toString());
+  const [monthTarget, setMonthTarget] = useState('');
 
   const [inputCaculate, setInputCaculate] = useState({
     salary: 0,
@@ -50,11 +52,11 @@ const SalaryTax = () => {
 
   useEffect(() => {
     fetchData();
-  }, [yearTarget]);
+  }, [yearTarget, monthTarget]);
 
   const fetchData = async () => {
     try {
-      const salarytaxResponse = await apiService.apiAllMonthSalaries(type !== 2 ? { employee_id: employee_id, year: yearTarget } : { year: yearTarget })
+      const salarytaxResponse = await apiService.apiAllMonthSalaries(type !== 2 ? { employee_id: employee_id, month: monthTarget, year: yearTarget } : { month: monthTarget, year: yearTarget })
 
       if (salarytaxResponse?.status === 200 && salarytaxResponse?.data?.err === 0) {
         setSalarytaxes(salarytaxResponse.data.data);
@@ -250,6 +252,22 @@ const SalaryTax = () => {
           </div>
           <div className="h-full">
             <select
+              id="month"
+              name="month"
+              value={monthTarget}
+              onChange={(e) => { setMonthTarget(e.target.value || ''); setIsLoading(true) }}
+              className="flex text-gray-600 justify-center items-center h-[41px] px-5 transition-colors duration-200 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Chọn tháng</option>
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="h-full">
+            <select
               id="year"
               name="year"
               value={yearTarget}
@@ -328,11 +346,11 @@ const SalaryTax = () => {
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.total_salary)}</td>
                 <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{formatToVND(salary.tax)}</td>
                 <td className="flex justify-center px-6 py-4 space-x-4 text-sm font-medium whitespace-nowrap">
-                 {
-                  type === 2 ? ( <button onClick={() => handleTryCaculateTaxOfYear(salary.employee_id)} className="text-green-600 hover:text-green-900" aria-label="Delete salary">
-                    <CiCalculator1 className="w-5 h-5" />
-                  </button>) :(<></>)
-                 }
+                  {
+                    type === 2 ? (<button onClick={() => handleTryCaculateTaxOfYear(salary.employee_id)} className="text-green-600 hover:text-green-900" aria-label="Delete salary">
+                      <CiCalculator1 className="w-5 h-5" />
+                    </button>) : (<></>)
+                  }
                   <button onClick={() => handleDelete(salary.id)} className="text-red-600 hover:text-red-900" aria-label="Delete salary">
                     <FiTrash2 className="w-5 h-5" />
                   </button>
